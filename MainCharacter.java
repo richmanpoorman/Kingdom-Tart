@@ -18,8 +18,8 @@ public class MainCharacter extends Character{
 	public HashMap<String, Lambda> cookBook = new HashMap<String, Lambda>();
 	public Lambda[] recipes = new Lambda[4];
 	
-	public MainCharacter(String name, double x, double y, int hp, int dmg, double width, double height, BufferedImage sprite) {
-		super(name, x, y, width, height, hp, dmg, sprite);
+	public MainCharacter(String name, double x, double y, int hp, int dmg, double width, double height) {
+		super(name, x, y, width, height, hp, dmg);
 	}
 	
 	public void add(Fruit fruit) {
