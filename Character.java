@@ -21,17 +21,14 @@ public class Character {
 	public int hp;
 	public int dmg;
 	public String name;
-	//sprite
-	public BufferedImage sprite;
 	//Constructor
-	public Character (String name, double x, double y, double width, double height, int hp, int dmg, BufferedImage sprite) {
+	public Character (String name, double x, double y, double width, double height, int hp, int dmg) {
 		this.x = x;
 		this.y = y;
 		this.hp = hp;
 		this.dmg = dmg;
 		this.width = width;
 		this.height = height;
-		this.sprite = sprite;
 		this.name = name;
 		
 	}
