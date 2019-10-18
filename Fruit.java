@@ -24,7 +24,7 @@ public class Fruit {
 		this.color = color;
 		this.flavor = flavor; 
 		this.sprite = sprite;
-		if(!dictionary.containsKey(name))
+		if(!dictionary.isEmpty() &&!dictionary.containsKey(name))
 			dictionary.put(name, new Fruit(name,color,flavor,sprite));
 	}
 	

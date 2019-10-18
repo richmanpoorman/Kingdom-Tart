@@ -18,7 +18,7 @@ public class MainCharacter extends Character{
 	public HashMap<String, Integer> inventory = new HashMap<String, Integer>();
 	public HashMap<String, Lambda> cookBook = new HashMap<String, Lambda>();
 	public Lambda[] recipes = new Lambda[4];
-	public int speed = 10;
+	public int speed = 5;
 	
 	public MainCharacter(String name, int x, int y, int hp, int dmg, int width, int height) {
 		super(name, x, y, width, height, hp, dmg);
@@ -28,9 +28,9 @@ public class MainCharacter extends Character{
 		inventory.put(fruit.name,inventory.get(fruit.name)+1);
 	}
 	
-	public boolean use(Fruit fruit) {
-		if (inventory.get(fruit.name) !=0) {
-			inventory.put(fruit.name,inventory.get(fruit.name)-1);
+	public boolean use(String fruit) {
+		if (inventory.get(fruit) !=0) {
+			inventory.put(fruit,inventory.get(fruit)-1);
 			return true;
 		}
 		return false;
