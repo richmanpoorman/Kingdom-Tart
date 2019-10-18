@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 
 public class Window extends JFrame{
 	public Window() {
+
 		add(new Main());
 		setTitle("Trailblazers");
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -36,6 +37,7 @@ public class Window extends JFrame{
 		setLocationRelativeTo(null);
 		setVisible(true);
 		setResizable(true);
+		
 	}
 
 	public static void main(String[] args) {

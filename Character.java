@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.awt.image.BufferedImage;
@@ -9,20 +10,21 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Character {
 	//position
-	public double x;
-	public double y;
+	public int x;
+	public int y;
 	//size
-	public double width;
-	public double height;
+	public int width;
+	public int height;
 	//stats
 	public int hp;
 	public int dmg;
 	public String name;
 	//Constructor
-	public Character (String name, double x, double y, double width, double height, int hp, int dmg) {
+	public Character (String name, int x, int y, int width, int height, int hp, int dmg) {
 		this.x = x;
 		this.y = y;
 		this.hp = hp;
@@ -33,7 +35,7 @@ public class Character {
 		
 	}
 	
-	public void move(double dx, double dy) {
+	public void move(int dx, int dy) {
 		x += dx;
 		y += dy;
 	}
@@ -52,6 +54,8 @@ public class Character {
 			l.interact();
 		}
 	}
+	
+	
 
 	
 }
