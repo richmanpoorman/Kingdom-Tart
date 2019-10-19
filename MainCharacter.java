@@ -25,7 +25,10 @@ public class MainCharacter extends Character{
 	}
 	
 	public void add(Fruit fruit) {
-		inventory.put(fruit.name,inventory.get(fruit.name)+1);
+		if(inventory.containsKey(fruit.name))
+			inventory.put(fruit.name,inventory.get(fruit.name)+1);
+		else
+			inventory.put(fruit.name,1);
 	}
 	
 	public boolean use(String fruit) {

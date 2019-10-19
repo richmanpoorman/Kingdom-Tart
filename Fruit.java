@@ -24,15 +24,29 @@ public class Fruit {
 		this.color = color;
 		this.flavor = flavor; 
 		this.sprite = sprite;
-		if(!dictionary.isEmpty() &&!dictionary.containsKey(name))
-			dictionary.put(name, new Fruit(name,color,flavor,sprite));
+		if(!dictionary.containsKey(name)) {
+			dictionary.put(name, new Fruit(name,color,flavor,sprite,true));
+			
+		}
+	}
+	public Fruit(String name, String color, String flavor, BufferedImage sprite, boolean a) {
+		this.name = name;
+		this.color = color;
+		this.flavor = flavor; 
+		this.sprite = sprite;
+		
 	}
 	
 	public Fruit(String name) {
 		this.name = name;
-		this.color = dictionary.get(name).color;
-		this.flavor = dictionary.get(name).flavor;
-		this.sprite = dictionary.get(name).sprite;
+		if (dictionary.containsKey(name)) {
+			this.color = dictionary.get(name).color;
+			this.flavor = dictionary.get(name).flavor;
+			this.sprite = dictionary.get(name).sprite;
+		}
+		else {
+			System.out.println(dictionary.keySet());
+		}
 	}
 	
 	

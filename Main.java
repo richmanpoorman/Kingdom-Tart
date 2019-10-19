@@ -175,14 +175,24 @@ public class Main extends JPanel implements Runnable{
 	public static Set<Integer> pressed;
 	
 	
+	public Fruit[] fruitSelect = new Fruit[4];
+	
 	public int selected = -1;
 	
+	// All the fruit set up
 	public Fruit[] setUp =  {
-		new Fruit("Strawberry","Red","Sweet",convert("")),
-		new Fruit("Pineapple","Yellow","Sweet",convert("Fruit Sprites-10.png")),
-		new Fruit("Banana","Yellow","Savory",convert("Fruit Sprites-11.png"))
+		new Fruit("Strawberry","Red","Sweet",convert("Strawberry.png")),
+		new Fruit("Pineapple","Yellow","Sweet",convert("Pineapple.png")),
+		new Fruit("Apple","Green","Sweet",convert("Apple.png")),
+		new Fruit("Banana","Yellow","Savory",convert("Banana.png")),
+		new Fruit("Blueberry","Blue","Sweet",convert("Blueberry.png")),
+		new Fruit("Carrot","Orange","Savory",convert("Carrot.png")),
+		new Fruit("Grapes","Purple","Savory",convert("Grapes.png")),
+		new Fruit("Kiwi","Green","Sweet",convert("Kiwi.png")),
+		new Fruit("Lemon","Yellow","Sour",convert("Lemon.png")),
+		new Fruit("Orange","Orange","Savory",convert("Orange.png")),
+		new Fruit("Pumpkin","Orange","Savory",convert("Pumpkin.png"))
 	};
-	
 	
 	public Tileset map;
 	public Enemy[] enemy = new Enemy[4];
@@ -192,41 +202,7 @@ public class Main extends JPanel implements Runnable{
 	
 	public static HashMap<String,Animation> anim = new HashMap<String, Animation>();
 	
-	/* Class to return images: stores images into "animations"  */
-	public class Animation{
-		public int frameCount = 0; // What frame it is on
-		
-		public ArrayList<BufferedImage> frames = new ArrayList<BufferedImage>(); // All the frames
-		
-		//Constructor
-		public Animation(ArrayList<BufferedImage> frames) {
-			this.frames = frames;	
-		}
-		
-		
-		public void reset () {// Returns the animation back to frame one
-			frameCount = 0;
-		}
-		
-		public BufferedImage play(boolean isLoop) { // Returns an image at each frame ( is played in run ) 
-			if(frames.size() < frameCount) { // Returns all the frames before the 
-				frameCount++;
-				return frames.get(frameCount-1);
-				
-			}
-			else if (isLoop) { // Checks if the animation wants to loop
-				frameCount = 0;
-			}
-			
-			return frames.get(frames.size()-1);	// Play the last frame
-			
-				
-		}
-		
-		public boolean isPlayed () { // Tests if animation is finished
-			return frameCount == frames.size();
-		}
-	}
+	
 	
 	public Main() {	
 		//adds all the components to look for
@@ -235,8 +211,26 @@ public class Main extends JPanel implements Runnable{
 		enemy[0] = new Enemy ("John Adams", 0, 0, 100, 100, 100, 100);
 		player = new MainCharacter("player",100,100,10,10,10,10); // Stock Character
 		player.setRecipes("", "", "", "");
-		
 		party[0] = player;
+		for (int i = 0; i < 10; i++) {
+			party[0].add(new Fruit("Strawberry"));
+			party[0].add(new Fruit("Pineapple"));
+			party[0].add(new Fruit("Apple"));
+			party[0].add(new Fruit("Banana"));
+			party[0].add(new Fruit("Blueberry"));
+			party[0].add(new Fruit("Carrot"));
+			party[0].add(new Fruit("Grapes"));
+			party[0].add(new Fruit("Kiwi"));
+			party[0].add(new Fruit("Lemon"));
+			party[0].add(new Fruit("Orange"));
+			party[0].add(new Fruit("Pumpkin"));
+		}
+		
+		
+		System.out.println(party[0].inventory.keySet());
+		System.out.println(getRandomFruit(4));
+		fruitSelect = getRandomFruit(4); // Fruit in random
+
 		pressed = new HashSet<Integer>();
 		setFocusable(true); // Allows the program to focus on different types of inputs
 		setDoubleBuffered(false);
@@ -247,30 +241,23 @@ public class Main extends JPanel implements Runnable{
 		
 	}
 
-	public BufferedImage convert (String f) {
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(new File(f));
-		}
-		catch(IOException e)
-		{}
-		return img;
-	}
-	
 	public void paint(Graphics g) {
-		g.drawImage(setUp[0].sprite, 0, 0, 100,100,null);
+		
 		g.clearRect(0, 0, this.getWidth(), this.getHeight()); // Clears the screen
 		// Frames of different gameplay
-		if (isBattle) {
+		if (isBattle) { // If in combat (combat animations)
 			
 			
-			for(int i = 0; i < 4; i++) {
-				g.fillRect(10 + 110 * i, 100, 100, 100);
-				if(selected >= 0) {
-					g.setColor(Color.RED);
-					g.fillRect(10 + 110 * selected, 100, 100, 100);
-					g.setColor(Color.BLACK);
+			for(int i = 0; i < 4; i++) { // for every slot
+				if(fruitSelect[i].sprite != null) // If the fruit exists
+					g.drawImage(fruitSelect[i].sprite, 10 + 110 * i, 100, 100, 100,this); // draw it
+				
+				if(selected >= 0) { // If one has been selected
+					if(fruitSelect[i].sprite != null) // If the image exists
+						g.drawImage(fruitSelect[selected].sprite, 10 + 110 * selected, 100, 100, 100,Color.RED ,this); // Give it a red background
 				}
+				
+				
 			}
 			
 			
@@ -279,8 +266,7 @@ public class Main extends JPanel implements Runnable{
 			}
 			
 		}
-		else {
-		//	System.out.println(player.x);
+		else { // If overworld (overworld animations)
 			g.fillRect(player.x,player.y,10,10);
 			
 		}
@@ -310,38 +296,7 @@ public class Main extends JPanel implements Runnable{
 			}
 		}
 	}
-	public boolean isBetween(int posX, int posY, int x, int w, int y, int h) {
-		return (posX >= x && posX <= x + w && posY >= y && posY <= y + h);
-	}
 	
-	/* Returns an array of random fruit from the inventory */
-	public String[] getRandomFruit(int numOfFruit) {
-		String[] fruitArray = new String[numOfFruit]; // Array to return
-		Set<String> partyKey = party[turn].inventory.keySet(); // Gets all the keys in the inventory
-		int o = 0; // counter
-		while(o < numOfFruit) { // while the thing is not full
-			int i = 0; // counter on which in the array
-			String a = ""; // fruit name
-			int partyKeyNum = (int)(Math.random() * partyKey.size()); // random one in bag
-			for(String s : partyKey) { // For every key in the dictionary
-				
-				if (i == partyKeyNum) { // if it is the random one
-					if(party[turn].inventory.get(s)>0) { // if you have it
-						a = s; // set string to the new thing
-						fruitArray[o] = a; // add to the output
-						o++; // next one
-						
-					}
-				}
-				
-				i++; // next fruit
-			}
-	
-		}
-		
-		return fruitArray; // return array of NAMES of the fruits
-			
-	}
 	
 	public void gameplay() {
 		
@@ -425,6 +380,58 @@ public class Main extends JPanel implements Runnable{
 		}
 		
 	}
+	public boolean isBetween(int posX, int posY, int x, int w, int y, int h) {
+		return (posX >= x && posX <= x + w && posY >= y && posY <= y + h);
+	}
+	
+	/* Returns an array of random fruit from the inventory */
+	public Fruit[] getRandomFruit(int numOfFruit) {
+		
+		Fruit[] fruitArray = new Fruit[numOfFruit]; // Array to return
+		Set<String> partyKey;
+		
+		if(!party[turn].inventory.isEmpty()) {
+			partyKey = party[turn].inventory.keySet(); // Gets all the keys in the inventory
+		}
+		else 
+			return null;
+		
+		int o = 0; // counter
+		
+		while(o < numOfFruit) { // while the thing is not full
+			int i = 0; // counter on which in the array
+			String a = ""; // fruit name
+			int partyKeyNum = (int)(Math.random() * partyKey.size()); // random one in bag
+			for(String s : partyKey) { // For every key in the dictionary
+				
+				if (i == partyKeyNum) { // if it is the random one
+					if(party[turn].inventory.get(s)>0) { // if you have it
+						a = s; // set string to the new thing
+						fruitArray[o] = Fruit.dictionary.get(a); // add to the output
+						o++; // next one
+						
+					}
+				}
+				
+				i++; // next fruit
+			}
+	
+		}
+		
+		return fruitArray; // return array of NAMES of the fruits
+			
+	}
+	
+
+	public BufferedImage convert (String f) {
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File(f));
+		}
+		catch(IOException e)
+		{}
+		return img;
+	}
 	
 	private class KeyListener extends KeyAdapter{
 		@Override
@@ -453,6 +460,42 @@ public class Main extends JPanel implements Runnable{
 		public void mouseReleased(MouseEvent e) {
 			// TODO Auto-generated method stub
 			
+		}
+	}
+	
+	/* Class to return images: stores images into "animations"  */
+	public class Animation{
+		public int frameCount = 0; // What frame it is on
+		
+		public ArrayList<BufferedImage> frames = new ArrayList<BufferedImage>(); // All the frames
+		
+		//Constructor
+		public Animation(ArrayList<BufferedImage> frames) {
+			this.frames = frames;	
+		}
+		
+		
+		public void reset () {// Returns the animation back to frame one
+			frameCount = 0;
+		}
+		
+		public BufferedImage play(boolean isLoop) { // Returns an image at each frame ( is played in run ) 
+			if(frames.size() < frameCount) { // Returns all the frames before the 
+				frameCount++;
+				return frames.get(frameCount-1);
+				
+			}
+			else if (isLoop) { // Checks if the animation wants to loop
+				frameCount = 0;
+			}
+			
+			return frames.get(frames.size()-1);	// Play the last frame
+			
+				
+		}
+		
+		public boolean isPlayed () { // Tests if animation is finished
+			return frameCount == frames.size();
 		}
 	}
 
