@@ -17,6 +17,7 @@ public class MainCharacter extends Character{
 	
 	public HashMap<String, Integer> inventory = new HashMap<String, Integer>();
 	public HashMap<String, Lambda> cookBook = new HashMap<String, Lambda>();
+	public HashMap<Lambda, String> cookBookName = new HashMap<Lambda, String>();
 	public Lambda[] recipes = new Lambda[4];
 	public int speed = 5;
 	
@@ -41,6 +42,7 @@ public class MainCharacter extends Character{
 	
 	public void addRecipe(String name, Lambda l) {
 		cookBook.put(name,l);
+		cookBookName.put(l, name);
 	}
 	
 	public void setRecipes(String a, String b, String c, String d) {

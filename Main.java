@@ -165,24 +165,41 @@ import javax.swing.JPanel;
 import javafx.scene.image.Image;
 
 public class Main extends JPanel implements Runnable{
+	
+	//player
 	public MainCharacter player;
+	
+	// party in battle
 	public MainCharacter[] party = new MainCharacter[4];
+	
+	// team (in background)
 	public ArrayList<MainCharacter> teammates = new ArrayList<MainCharacter>();
 	
+	// Whos turn in the party it is
 	public int turn = 0;
+	
+	// Checks turn
 	public boolean isTurn = true;
 	
+	// Key inputs
 	public static Set<Integer> pressed;
 	
+	// Turn counter
+	public ArrayList<Integer> turns = new ArrayList<Integer>();
 	
+	//Fruits to use
 	public Fruit[] fruitSelect = new Fruit[4];
 	
+	// Choice of Fruit
 	public int selected = -1;
+	
+	// Store fruit chosen
+	private Fruit fruitIn;
 	
 	// All the fruit set up
 	public Fruit[] setUp =  {
 		new Fruit("Strawberry","Red","Sweet",convert("Strawberry.png")),
-		new Fruit("Pineapple","Yellow","Sweet",convert("Pineapple.png")),
+		new Fruit("Pineapple","Yellow","Sweet",convert("Pinapple.png")),
 		new Fruit("Apple","Green","Sweet",convert("Apple.png")),
 		new Fruit("Banana","Yellow","Savory",convert("Banana.png")),
 		new Fruit("Blueberry","Blue","Sweet",convert("Blueberry.png")),
@@ -193,13 +210,22 @@ public class Main extends JPanel implements Runnable{
 		new Fruit("Orange","Orange","Savory",convert("Orange.png")),
 		new Fruit("Pumpkin","Orange","Savory",convert("Pumpkin.png"))
 	};
-	
+	// Map
 	public Tileset map;
-	public Enemy[] enemy = new Enemy[4];
-	public int[] mousePos = new int[2];
-	public ArrayList<Enemy> enemiesInField = new ArrayList<Enemy>();
-	public boolean isBattle = true;
 	
+	// enemy attack party
+	public Enemy[] enemy = new Enemy[4];
+	
+	// mouse pos when clicked
+	public int[] mousePos = new int[2];
+	
+	//Enemies in the overworld
+	public ArrayList<Enemy> enemiesInField = new ArrayList<Enemy>();
+	
+	// If in battle
+	public boolean isBattle = false;
+	
+	// All the animations
 	public static HashMap<String,Animation> anim = new HashMap<String, Animation>();
 	
 	
@@ -208,10 +234,32 @@ public class Main extends JPanel implements Runnable{
 		//adds all the components to look for
 		addKeyListener(new KeyListener());
 		addMouseListener(new MouseListener());
-		enemy[0] = new Enemy ("John Adams", 0, 0, 100, 100, 100, 100);
+		enemy[0] = new Enemy ("John Adams", 0, 0, 100, 100, 100, 100, true); // Stock enemy
 		player = new MainCharacter("player",100,100,10,10,10,10); // Stock Character
-		player.setRecipes("", "", "", "");
-		party[0] = player;
+		player.addRecipe
+		("Test", 
+				() -> {
+					int target = 0;
+					for(Enemy e : enemy) {
+						if(e.hp>0) {
+							break;
+						}
+						target++;
+					}
+					
+					enemy[target].hp-=party[turn].dmg;
+					
+				}
+		);
+		
+		
+		
+		player.setRecipes("Test", "", "", ""); // Recipe setter
+
+		party[0] = player; // 
+		
+		
+		
 		for (int i = 0; i < 10; i++) {
 			party[0].add(new Fruit("Strawberry"));
 			party[0].add(new Fruit("Pineapple"));
@@ -225,6 +273,7 @@ public class Main extends JPanel implements Runnable{
 			party[0].add(new Fruit("Orange"));
 			party[0].add(new Fruit("Pumpkin"));
 		}
+		
 		
 		
 		System.out.println(party[0].inventory.keySet());
@@ -241,39 +290,6 @@ public class Main extends JPanel implements Runnable{
 		
 	}
 
-	public void paint(Graphics g) {
-		
-		g.clearRect(0, 0, this.getWidth(), this.getHeight()); // Clears the screen
-		// Frames of different gameplay
-		if (isBattle) { // If in combat (combat animations)
-			
-			
-			for(int i = 0; i < 4; i++) { // for every slot
-				if(fruitSelect[i].sprite != null) // If the fruit exists
-					g.drawImage(fruitSelect[i].sprite, 10 + 110 * i, 100, 100, 100,this); // draw it
-				
-				if(selected >= 0) { // If one has been selected
-					if(fruitSelect[i].sprite != null) // If the image exists
-						g.drawImage(fruitSelect[selected].sprite, 10 + 110 * selected, 100, 100, 100,Color.RED ,this); // Give it a red background
-				}
-				
-				
-			}
-			
-			
-			for(int i = 0; i < 4; i ++ ) {
-				g.fillRect(10 + 110 * i, 400, 100, 100);
-			}
-			
-		}
-		else { // If overworld (overworld animations)
-			g.fillRect(player.x,player.y,10,10);
-			
-		}
-		
-		g.fillRect(mousePos[0], mousePos[1], 10, 10); // Test: Create box at the specified mouse click
-		//g.dispose(); // Supposed to clear the screen, but doesn't work
-	}
 	
 	public void run() {
 		long beforeTime = System.currentTimeMillis();
@@ -297,41 +313,71 @@ public class Main extends JPanel implements Runnable{
 		}
 	}
 	
-	
 	public void gameplay() {
 		
 		if (isBattle) { // Checks if in battle
 			if(isTurn) { // Your turn
-				if(party[turn] != null) { // if there is a party member
-										
-					if(isBetween(mousePos[0],mousePos[1],10,100,100,100)) {
-						
-						selected = 0;
-						
-						
+		 		if(party[turn] != null) { // if there is a party member
+					
+		 			//Fruit selector
+					if(isBetween(mousePos[0],mousePos[1],10,100,100,100)) { // Fruit in slot a
+						selected = 0;	
+						fruitIn = fruitSelect[selected];
 					}
-					else if(isBetween(mousePos[0],mousePos[1],120,100,100,100)) {
-						
+					else if(isBetween(mousePos[0],mousePos[1],120,100,100,100)) { // Fruit in slot b
 						selected = 1;
-						
-						
+						fruitIn = fruitSelect[selected];
 					}
-					else if(isBetween(mousePos[0],mousePos[1],230,100,100,100)) {
-						
+					else if(isBetween(mousePos[0],mousePos[1],230,100,100,100)) { // Fruit in slot c
 						selected = 2;
-						
-						
+						fruitIn = fruitSelect[selected];
 					}
-					else if(isBetween(mousePos[0],mousePos[1],340,100,100,100)) {
-						
+					else if(isBetween(mousePos[0],mousePos[1],340,100,100,100)) { // Fruit in slot d
 						selected = 3;
-						
-						
+						fruitIn = fruitSelect[selected];
 					}
 					
 					
+					if(selected >= 0) { // If something is selected
+						if(isBetween(mousePos[0],mousePos[1],10,100,400,100)) { // Fruit in slot a
+							
+							party[turn].recipes[0].interact();
+							
+							selected = -1;
+							
+						}
+						else if(isBetween(mousePos[0],mousePos[1],120,100,400,100)) { // Fruit in slot b
+
+							party[turn].recipes[1].interact();
+							
+							selected = -1;
+							
+						}
+						else if(isBetween(mousePos[0],mousePos[1],230,100,400,100)) { // Fruit in slot c
+
+							party[turn].recipes[2].interact();
+							
+							selected = -1;
+							
+						}
+						else if(isBetween(mousePos[0],mousePos[1],340,100,400,100)) { // Fruit in slot d
+
+							party[turn].recipes[3].interact();
+							
+							selected = -1;
+							
+						}
+						
+						
+
+						
+					}
 					
-					
+					if(isBetween(mousePos[0],mousePos[1],10,100,250,100)) {
+						mousePos[0]=0;
+						mousePos[1]=1;
+						turn++;
+					}
 					
 				}
 				else { // if no member, skip
@@ -348,11 +394,11 @@ public class Main extends JPanel implements Runnable{
 				
 				
 				
-				
 			}
 			else { // Enemy Turn
 				isTurn = true; // Testing: player turn;
 				System.out.println("Enemy");
+				System.out.println(enemy[0].hp);
 				
 			}
 			
@@ -376,10 +422,80 @@ public class Main extends JPanel implements Runnable{
 		else { // Not in combat
 			
 			player.playerUpdate(pressed); // Momentary: creates a square where the Main Character is
+			/* TEST: Make enemies */
+			int spawnChance = (int)(Math.random()*100);
+			
+			if(spawnChance <= 3) {
+				enemiesInField.add(new Enemy("John Adams", (int)(Math.random()*(this.getWidth()-10)),(int)(Math.random()*(this.getHeight()-10) )));
+				
+			}
+			
+			for(Enemy e : enemiesInField) {
+				if(isBetween(e.x,e.y,player.x,50,player.y,100))isBattle = true;
+			}
 			
 		}
 		
 	}
+	
+	public void paint(Graphics g) {
+		
+		g.clearRect(0, 0, this.getWidth(), this.getHeight()); // Clears the screen
+		// Frames of different gameplay
+		if (isBattle) { // If in combat (combat animations)
+			
+			for(int i = 0; i < 4; i++) { // for every slot
+				if(fruitSelect[i].sprite != null) // If the fruit exists
+					g.drawImage(fruitSelect[i].sprite, 10 + 110 * i, 100, 100, 100,this); // draw it
+				
+				if(selected >= 0) { // If one has been selected
+					if(fruitSelect[i].sprite != null) // If the image exists
+						g.drawImage(fruitSelect[selected].sprite, 10 + 110 * selected, 100, 100, 100,Color.RED ,this); // Give it a red background
+				}
+				
+				
+			}
+			
+			
+			for(int i = 0; i < 4; i ++ ) {
+				// Recipes
+				g.setColor(Color.GRAY);
+				
+				g.fillRect(10 + 110 * i, 400, 100, 100);
+				g.setColor(Color.BLACK);
+				if(turn < party.length) {
+					// draws the name of it on the block, none if there is no recipe
+					g.drawString((turn < party.length&&!party[turn].cookBookName.isEmpty()&&party[turn].cookBookName.containsKey(party[turn].recipes[i])&& party[turn].cookBookName.get(party[turn].recipes[i]) !=null)?party[turn].cookBookName.get(party[turn].recipes[i]):"NONE", 30 + 110 * i, 450);
+// Test Conditions	//System.out.println((turn < party.length) + " " +(!party[turn].cookBookName.isEmpty()) + " " +(party[turn].cookBookName.containsKey(party[turn].recipes[i])) + " " +(party[turn].cookBookName.get(party[turn].recipes[i]) !=null));
+					
+				}
+
+			}
+			
+			// End turn button
+			g.setColor(Color.GREEN);
+			g.fillRect (10,250, 100,100);
+			g.setColor(Color.BLACK);
+			
+		}
+		else { // If overworld (overworld animations)
+			g.drawImage(convert("Main Character.png"),player.x,player.y,50,100,this);
+			//g.fillRect(player.x,player.y,10,10);
+			g.setColor(Color.RED);
+			
+			if(!enemiesInField.isEmpty()) {
+				for(Enemy e : enemiesInField) {
+					g.fillRect(e.x, e.y, 10, 10);
+				}
+			}
+			
+			g.setColor(Color.BLACK);
+		}
+		
+		g.fillRect(mousePos[0], mousePos[1], 10, 10); // Test: Create box at the specified mouse click
+		//g.dispose(); // Supposed to clear the screen, but doesn't work
+	}
+	
 	public boolean isBetween(int posX, int posY, int x, int w, int y, int h) {
 		return (posX >= x && posX <= x + w && posY >= y && posY <= y + h);
 	}
