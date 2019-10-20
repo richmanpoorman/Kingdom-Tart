@@ -23,6 +23,7 @@ public class Character {
 	public int hp;
 	public int dmg;
 	public String name;
+	public int maxHp;
 	//Constructor
 	public Character (String name, int x, int y, int width, int height, int hp, int dmg) {
 		this.x = x;
@@ -32,7 +33,7 @@ public class Character {
 		this.width = width;
 		this.height = height;
 		this.name = name;
-		
+		this.maxHp = hp;
 	}
 	
 	public void move(int dx, int dy) {

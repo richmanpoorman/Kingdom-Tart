@@ -4,13 +4,16 @@ import java.util.HashMap;
 public class Enemy extends Character{
 	public Lambda attack;
 	public static HashMap<String, Enemy> dictionary = new HashMap<String, Enemy>();
+	public static int index = 0;
 	
 	//Constructors
 	public Enemy(String name, int x, int y, int hp, int dmg, int width, int height) {
 		super(name, x, y, width, height, hp, dmg);
+		index++;
 	}
 	public Enemy(String name, int x, int y) {
 		super(name,x,y,dictionary.get(name).width,dictionary.get(name).height,dictionary.get(name).hp,dictionary.get(name).dmg);
+		index++;
 	}
 	//Prevent recursion
 	public Enemy(String name, int x, int y, int hp, int dmg, int width, int height, boolean a) {
