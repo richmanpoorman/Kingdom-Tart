@@ -16,8 +16,8 @@ import java.util.HashMap;
 public class MainCharacter extends Character{
 	
 	public HashMap<String, Integer> inventory = new HashMap<String, Integer>();
-	public HashMap<String, Lambda> cookBook = new HashMap<String, Lambda>();
-	public HashMap<Lambda, String> cookBookName = new HashMap<Lambda, String>();
+	public static HashMap<String, Lambda> cookBook = new HashMap<String, Lambda>();
+	public static HashMap<Lambda, String> cookBookName = new HashMap<Lambda, String>();
 	public Lambda[] recipes = new Lambda[4];
 	public int speed = 5;
 	
