@@ -1,144 +1,4 @@
-/*   // Using buttons : not correct gameplay
-*					if(isBetween(mousePos[0], mousePos[1], 10, 100, 400, 100)) { // If in atk block 1
-*						mousePos[0] = 10; // Locks mouse x movement
-*						mousePos[1] = 400; // Locks mouse y movement
-*						System.out.println("ATK 1");
-*						
-*						
-*						if(!anim.isEmpty() && anim.containsKey(party[turn].name)) { // If there is an animation
-							if(anim.get(party[turn].name).isPlayed()) { // if the animation has played, go to the next character
-								
-	
-									if(party[turn].recipes[0] != null) // If they have a function
-										party[turn].recipes[0].interact(); // Do it
-								
-								turn++; // next person
-								// Mouse reset
-								mousePos[0] = 0;
-								mousePos[1] = 0;
-	
-								
-							}
-						}
-						else { // if there is no animation, just go to the next character
-							
-
-								if(party[turn].recipes[1] != null) // If they have a function
-									party[turn].recipes[1].interact(); // Do it
-							
-							turn++; // next person
-							// Mouse reset
-							mousePos[0] = 0;
-							mousePos[1] = 0;
-	
-						}
-						
-				
-					
-					}
-					else if(isBetween(mousePos[0], mousePos[1], 120, 100, 400, 100)) { // If in atk block 2
-						mousePos[0] = 120;
-						mousePos[1] = 400;
-						System.out.println("ATK 2");
-						if(!anim.isEmpty() && anim.containsKey(party[turn].name)) {
-							
-
-								if(party[turn].recipes[3] != null) // If they have a function
-									party[turn].recipes[2].interact(); // Do it
-							
-							if(anim.get(party[turn].name).isPlayed()) {
-								turn++; // next person
-								// Mouse reset
-								mousePos[0] = 0;
-								mousePos[1] = 0;
-							}
-	
-						}
-						else {
-							
-
-								if(party[turn].recipes[3] != null) // If they have a function
-									party[turn].recipes[3].interact(); // Do it
-							
-							turn++; // next person
-							// Mouse reset
-							mousePos[0] = 0;
-							mousePos[1] = 0;
-	
-						}
-				
-					
-					}
-					else if(isBetween(mousePos[0], mousePos[1], 230, 100, 400, 100)) { // If in atk block 3
-						mousePos[0] = 230;
-						mousePos[1] = 400;
-						System.out.println("ATK 3");
-						
-						
-						if(!anim.isEmpty() && anim.containsKey(party[turn].name)) {
-							if(anim.get(party[turn].name).isPlayed()) {
-								
-	
-									if(party[turn].recipes[0] != null) // If they have a function
-										party[turn].recipes[0].interact(); // Do it
-								
-								turn++; // next person
-								// Mouse reset
-								mousePos[0] = 0;
-								mousePos[1] = 0;
-	
-							}
-						}
-						else {  // if there is no animation, just go to the next character
-							
-
-								if(party[turn].recipes[0] != null) // If they have a function
-									party[turn].recipes[0].interact(); // Do it
-							
-							turn++; // next person
-							// Mouse reset
-							mousePos[0] = 0;
-							mousePos[1] = 0;
-							
-						}
-					
-					
-					}
-					else if(isBetween(mousePos[0], mousePos[1], 340, 100, 400, 100)) { // If in atk block 4
-						mousePos[0] = 340;
-						mousePos[1] = 400;
-						System.out.println("ATK 4");
-						
-						
-						if(!anim.isEmpty() && anim.containsKey(party[turn].name)) {
-							if(anim.get(party[turn].name).isPlayed()) {
-								
-	
-									if(party[turn].recipes[0] != null) // If they have a function
-										party[turn].recipes[0].interact(); // Do it
-								
-								turn++; // next person
-								// Mouse reset
-								mousePos[0] = 0;
-								mousePos[1] = 0;
-	
-							}
-						}
-						else {// if there is no animation, just go to the next character
-							
-
-								if(party[turn].recipes[0] != null) // If they have a function
-									party[turn].recipes[0].interact(); // Do it
-							
-							turn++; // next person
-							// Mouse reset
-							mousePos[0] = 0;
-							mousePos[1] = 0;
-							
-							
-	
-						}
-					} */
+// // // //
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -166,7 +26,6 @@ import javax.swing.JPanel;
 import javafx.scene.image.Image;
 
 public class Main extends JPanel implements Runnable{
-	
 	//player
 	public MainCharacter player;
 	
@@ -189,13 +48,17 @@ public class Main extends JPanel implements Runnable{
 	public static Set<Integer> pressed;
 	
 	// Turn counter
-	public ArrayList<Integer> turns = new ArrayList<Integer>();
+	public int[][] countDown = new int[4][4];
+	public int[][] countDownEnemy = new int[4][4];
 	
 	//Fruits to use
 	public Fruit[] fruitSelect = new Fruit[4];
 	
 	// Choice of Fruit
 	public int selected = -1;
+	
+	// Choice of recipe
+	public int recipePlace = -1;
 	
 	// Store fruit chosen
 	private Fruit fruitIn;
@@ -220,6 +83,9 @@ public class Main extends JPanel implements Runnable{
 	// enemy attack party
 	public Enemy[] enemy = new Enemy[4];
 	
+	// attacking which enemy
+	public int target;
+	
 	// mouse pos when clicked
 	public int[] mousePos = new int[2];
 	
@@ -238,32 +104,40 @@ public class Main extends JPanel implements Runnable{
 		//adds all the components to look for
 		addKeyListener(new KeyListener());
 		addMouseListener(new MouseListener());
-		enemy[0] = new Enemy ("John Adams", 0, 0, 40, 100, 100, 100, true); // Stock enemy
-		player = new MainCharacter("player",100,100,10,10,10,10); // Stock Character
+		
+		// Reset the counters
+		for(int i = 0; i < 4; i++) {
+			for (int o = 0; o < 4; o++) {
+				countDown[o][i] = 0;
+				countDownEnemy[o][i] = 0;
+			}
+		}	
+		
+		enemy[0] = new Enemy ("John Adams", 0, 0, 40, 100, 10, 10, true); // Stock enemy
+		player = new MainCharacter("player",100,100,10,10,50,100); // Stock Character
 		player.addRecipe
 		("Test", 
-				() -> {
-					int target = 0;
-					for(Enemy e : enemy) {
-						if(e.hp>0) {
-							break;
-						}
-						target++;
-					}
 					
-					enemy[target].hp-=party[turn].dmg;
-					
-				}
+				attackSetUp(3, () -> {
+					enemy[target].hp -= party[turn].dmg;
+				})
+			
 		);
 		
+		player.addRecipe
+		("Bake",
+				
+				attackSetUp(10, () -> {
+					enemy[target].hp -= party[turn].dmg * 3;
+				})
+		);
 		
-		
-		player.setRecipes("Test", "", "", ""); // Recipe setter
+		player.setRecipes("Test", "Bake", "", ""); // Recipe setter
 
-		party[0] = player; // 
+		party[0] = player; // Set player to the party
 		
 		
-		
+		// Adds all the fruits 
 		for (int i = 0; i < 10; i++) {
 			party[0].add(new Fruit("Strawberry"));
 			party[0].add(new Fruit("Pineapple"));
@@ -345,35 +219,52 @@ public class Main extends JPanel implements Runnable{
 					if(selected >= 0) { // If something is selected
 						if(isBetween(mousePos[0],mousePos[1],10,100,400,100)) { // Fruit in slot a
 							if(fruitSelect[selected] != null) {
+								// Choice recipe
+								recipePlace = 0;
+								
+								// Which recipe
 								party[turn].recipes[0].interact();
-								fruitSelect[selected] = null;
+
+								// MOMENTARY : Removes fruit select when used
+								//fruitSelect[selected] = null;
+
+								//Reset the selection of fruit and recipe spot
 								selected = -1;
+								recipePlace = -1;
 							}
 						}
 						else if(isBetween(mousePos[0],mousePos[1],120,100,400,100)) { // Fruit in slot b
 
 							if(fruitSelect[selected] != null) {
+								recipePlace = 1;
 								party[turn].recipes[1].interact();
-								fruitSelect[selected] = null;
+							//	fruitSelect[selected] = null;
 								selected = -1;
+								recipePlace = -1;
 							}
 							
 						}
 						else if(isBetween(mousePos[0],mousePos[1],230,100,400,100)) { // Fruit in slot c
-
+							
 							if(fruitSelect[selected] != null) {
+								
+								
+								recipePlace = 2;
 								party[turn].recipes[2].interact();
-								fruitSelect[selected] = null;
+							//	fruitSelect[selected] = null;
 								selected = -1;
+								recipePlace = -1;
 							}
 							
 						}
 						else if(isBetween(mousePos[0],mousePos[1],340,100,400,100)) { // Fruit in slot d
 
 							if(fruitSelect[selected] != null) {
+								recipePlace = 3;
 								party[turn].recipes[3].interact();
-								fruitSelect[selected] = null;
+							//	fruitSelect[selected] = null;
 								selected = -1;
+								recipePlace = -1;
 							}
 							
 						}
@@ -390,6 +281,11 @@ public class Main extends JPanel implements Runnable{
 							fruitSelect = getRandomFruit(4);
 						turn++;
 						
+						// Countdown for each turn
+						for (int i = 0; i < 4; i++)
+							for (int o = 0; o < 4; o++)
+								if(countDown[o][i]>0)
+									countDown[o][i]--;
 					}
 					
 				}
@@ -409,9 +305,13 @@ public class Main extends JPanel implements Runnable{
 				
 			}
 			else { // Enemy Turn
+				for (Enemy e : enemy) {
+					
+				}
+
 				isTurn = true; // Testing: player turn;
-				System.out.println("Enemy");
-				System.out.println(enemy[0].hp);
+			//	System.out.println("Enemy");
+			//	System.out.println(enemy[0].hp);
 				
 			}
 			
@@ -425,6 +325,7 @@ public class Main extends JPanel implements Runnable{
 						if(e.hp <= 0) {	
 							isBattle = false;
 						}
+			
 			if(party == null) // Checks if the party has people
 				isBattle = false;
 			else
@@ -450,13 +351,25 @@ public class Main extends JPanel implements Runnable{
 				enemiesInField.add(new Enemy("John Adams", (int)(Math.random()*(this.getWidth()-10)),(int)(Math.random()*(this.getHeight()-10) )));
 				
 			}
-			for(Enemy e : enemiesInField) {
-				if(isBetween(e.x,e.y,player.x,50,player.y,100)) {
-					isBattle = true;
-					enemy[0] = e;
-					enemiesInField.remove(e);
+			/**/
+			
+			for(Enemy e : enemiesInField) { // Check every enemy
+				// If contact
+				if(isBetween(e.x,e.y,player.x,player.width,player.y,player.height)||isBetween(e.x+e.width,e.y+e.height,player.x,player.width,player.y,player.height)) {
+					isBattle = true; // Enter battle
+					enemy[0] = e; // Add it to the attack party
+					enemiesInField.remove(e); // Get rid of the enemy
 					fruitSelect = getRandomFruit(4); // Fruit in random
-					break;
+					
+					// Reset the counters
+					for(int i = 0; i < 4; i++) {
+						for (int o = 0; o < 4; o++) {
+							countDown[o][i] = 0;
+							countDownEnemy[o][i] = 0;
+						}
+					}	
+					
+					break; // Stop looking
 				}
 			}
 			
@@ -479,8 +392,10 @@ public class Main extends JPanel implements Runnable{
 			//Enemy HP Bar
 			g.fillRect(500, 350, 100, 20);
 			g.setColor(Color.RED);
-			if(enemyTurn < enemy.length)
+			if(enemyTurn < enemy.length) {
+				g.drawString(enemy[enemyTurn].name,500, 340);
 				g.fillRect(500, 350, enemy[enemyTurn].hp*100/enemy[enemyTurn].maxHp, 20);
+			}
 			g.setColor(Color.BLACK);
 			
 			for(int i = 0; i < 4; i++) { // for every slot
@@ -505,8 +420,8 @@ public class Main extends JPanel implements Runnable{
 				if(turn < party.length) {
 					// draws the name of it on the block, none if there is no recipe
 					g.drawString((turn < party.length&&!party[turn].cookBookName.isEmpty()&&party[turn].cookBookName.containsKey(party[turn].recipes[i])&& party[turn].cookBookName.get(party[turn].recipes[i]) !=null)?party[turn].cookBookName.get(party[turn].recipes[i]):"NONE", 30 + 110 * i, 450);
-// Test Conditions	//System.out.println((turn < party.length) + " " +(!party[turn].cookBookName.isEmpty()) + " " +(party[turn].cookBookName.containsKey(party[turn].recipes[i])) + " " +(party[turn].cookBookName.get(party[turn].recipes[i]) !=null));
-					
+					if (party[turn]!=null)
+						g.drawString((countDown[turn][i])+"", 30 + 110 * i, 475);
 				}
 
 			}
@@ -577,6 +492,31 @@ public class Main extends JPanel implements Runnable{
 			
 	}
 	
+	public int setEnemy () {
+		int target = 0;
+		for(Enemy e : enemy) {
+			if(e.hp>0) {
+				break;
+			}
+			target++;
+		}
+		return target;
+	}
+
+	public Lambda attackSetUp(int turnA , Lambda l) {
+		return (()->{
+			
+			target = setEnemy(); // Sets the target as the enemy
+			System.out.println(recipePlace);
+			if(recipePlace!=-1 && turn < 4 && countDown[turn][recipePlace] == 0) {
+				l.interact();
+				countDown[turn][recipePlace] = turnA;
+				fruitSelect[selected] = null;
+			}
+
+			
+		});
+	}
 
 	public BufferedImage convert (String f) {
 		BufferedImage img = null;
