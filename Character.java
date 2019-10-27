@@ -24,6 +24,9 @@ public class Character {
 	public int dmg;
 	public String name;
 	public int maxHp;
+	
+	public boolean isTeam;
+	
 	//Constructor
 	public Character (String name, int x, int y, int width, int height, int hp, int dmg) {
 		this.x = x;

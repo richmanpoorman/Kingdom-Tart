@@ -23,6 +23,7 @@ public class MainCharacter extends Character{
 	
 	public MainCharacter(String name, int x, int y, int hp, int dmg, int width, int height) {
 		super(name, x, y, width, height, hp, dmg);
+		isTeam = true;
 	}
 	
 	public void add(Fruit fruit) {

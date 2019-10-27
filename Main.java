@@ -37,6 +37,7 @@ public class Main extends JPanel implements Runnable{
 	
 	// Whos turn in the party it is
 	public int turn = 0;
+	public int turnEnemy = 0;
 	
 	//Enemy turn counter
 	public int enemyTurn = 0;
@@ -62,7 +63,7 @@ public class Main extends JPanel implements Runnable{
 	public int recipePlace = -1;
 	
 	// Store fruit chosen
-	private Fruit fruitIn;
+	//private Fruit fruitIn; // NEVER USED
 	
 	// All the fruit set up
 	public Fruit[] setUp =  {
@@ -99,7 +100,11 @@ public class Main extends JPanel implements Runnable{
 	// All the animations
 	public static HashMap<String,Animation> anim = new HashMap<String, Animation>();
 	
+	// isEnemy but better
+	public boolean isEnemy = true;
 	
+	// Thread
+	Thread t = new Thread(this);
 	
 	public Main() {	
 		//adds all the components to look for
@@ -113,27 +118,59 @@ public class Main extends JPanel implements Runnable{
 				countDownEnemy[o][i] = 0;
 			}
 		}	
+		isEnemy = false;
+		enemy[0] = new Enemy ("John Adams", 0, 0, 100, 1, 10, 10, true); // Stock enemy
+		enemy[0].addRecipe("XYZ Affair", 
+				attackSetUp(3, ()->{party[0].hp-=enemy[0].dmg;}
+				, isEnemy)
+		);
 		
-		enemy[0] = new Enemy ("John Adams", 0, 0, 40, 1, 10, 10, true); // Stock enemy
+		enemy[0].addRecipe("Alien and Sedition Acts", 
+				attackSetUp(5, ()->{party[0].hp-=enemy[0].dmg * 2;}
+				, isEnemy)
+		);
+		
 		player = new MainCharacter("player",100,100,10,10,50,100); // Stock Character
+		
+		// Adds Test Recipe
 		player.addRecipe
 		("Test", 
 					
 				attackSetUp(3, () -> {
 					enemy[target].hp -= party[turn].dmg;
-				})
+				}
+				, true)
 			
 		);
 		
+		// Adds Bake Recipe
 		player.addRecipe
 		("Bake",
 				
 				attackSetUp(10, () -> {
 					enemy[target].hp -= party[turn].dmg * 3;
-				})
+				}
+				, true)
 		);
 		
-		player.setRecipes("Test", "Bake", "", ""); // Recipe setter
+		
+		player.addRecipe("Midnight Snack", 
+				attackSetUp(10 , 
+						() -> {
+							int heal = 10;
+							if(party[turn].hp+ heal < party[turn].maxHp)
+								party[turn].hp+= 10;
+							else
+								party[turn].hp = party[turn].maxHp;
+							
+						}
+				, true)
+			
+				
+				
+		);
+		
+		player.setRecipes("Test", "Bake", "Midnight Snack", ""); // Recipe setter
 
 		party[0] = player; // Set player to the party
 		
@@ -164,12 +201,11 @@ public class Main extends JPanel implements Runnable{
 		setDoubleBuffered(false);
 		
 		// Starts runnable
-		Thread t = new Thread(this);
+		//Thread t = new Thread(this);
 		t.start(); 
 		
 	}
 
-	
 	public void run() {
 		long beforeTime = System.currentTimeMillis();
 		
@@ -197,23 +233,25 @@ public class Main extends JPanel implements Runnable{
 			if (isBattle) { // Checks if in battle
 				if(isTurn) { // Your turn
 			 		if(party[turn] != null) { // if there is a party member
-						
+						//Party turn
+			 			isEnemy = true;
+			 			
 			 			//Fruit selector
 						if(isBetween(mousePos[0],mousePos[1],10,100,100,100)) { // Fruit in slot a
 							selected = 0;	
-							fruitIn = fruitSelect[selected];
+						//	fruitIn = fruitSelect[selected];
 						}
 						else if(isBetween(mousePos[0],mousePos[1],120,100,100,100)) { // Fruit in slot b
 							selected = 1;
-							fruitIn = fruitSelect[selected];
+						//	fruitIn = fruitSelect[selected];
 						}
 						else if(isBetween(mousePos[0],mousePos[1],230,100,100,100)) { // Fruit in slot c
 							selected = 2;
-							fruitIn = fruitSelect[selected];
+						//	fruitIn = fruitSelect[selected];
 						}
 						else if(isBetween(mousePos[0],mousePos[1],340,100,100,100)) { // Fruit in slot d
 							selected = 3;
-							fruitIn = fruitSelect[selected];
+						//	fruitIn = fruitSelect[selected];
 						}
 						
 						
@@ -275,7 +313,7 @@ public class Main extends JPanel implements Runnable{
 							
 						}
 						
-						if(isBetween(mousePos[0],mousePos[1],10,100,250,100)) {
+						if(isBetween(mousePos[0],mousePos[1],10,100,250,100)) { // Choose end turn
 							mousePos[0]=0;
 							mousePos[1]=1;
 							if(turn < party.length && !party[turn].inventory.isEmpty())
@@ -287,6 +325,11 @@ public class Main extends JPanel implements Runnable{
 								for (int o = 0; o < 4; o++)
 									if(countDown[o][i]>0)
 										countDown[o][i]--;
+							
+							for (int i = 0; i < 4; i++)
+								for (int o = 0; o < 4; o++)
+									if(countDownEnemy[o][i]>0)
+										countDownEnemy[o][i]--;
 						}
 						
 					}
@@ -306,10 +349,12 @@ public class Main extends JPanel implements Runnable{
 					
 				}
 				else { // Enemy Turn
+					// isEnemy false : enemy is person
+					isEnemy = false;
 					
 					for(Enemy e : enemy) {
-						if(e != null)
-							party[0].hp-=e.dmg;
+						if(e != null && e.recipes[0] != null)
+							e.recipes[0].interact();
 					}
 	
 					isTurn = true; // Testing: player turn;
@@ -353,7 +398,8 @@ public class Main extends JPanel implements Runnable{
 
 							}
 							if(p == party.length)
-								teammates.add(e.joinParty());
+								if(e!= null)
+									teammates.add(e.joinParty());
 
 						}
 					}
@@ -391,7 +437,9 @@ public class Main extends JPanel implements Runnable{
 				int spawnChance = (int)(Math.random()*100);
 				
 				if(spawnChance <= 3) {
-					enemiesInField.add(new Enemy("John Adams", (int)(Math.random()*(this.getWidth()-10)),(int)(Math.random()*(this.getHeight()-10) )));
+					Enemy e = new Enemy("John Adams", (int)(Math.random()*(this.getWidth()-10)),(int)(Math.random()*(this.getHeight()-10) ));
+					e.setRecipes("XYZ Affair", "", "", "");
+					enemiesInField.add(e);
 					
 				}
 				/**/
@@ -407,7 +455,7 @@ public class Main extends JPanel implements Runnable{
 						// Reset the counters
 						for(int i = 0; i < 4; i++) {
 							for (int o = 0; o < 4; o++) {
-								countDown[o][i] = 0;
+								countDownEnemy[o][i] = 0;
 								countDownEnemy[o][i] = 0;
 							}
 						}	
@@ -416,6 +464,16 @@ public class Main extends JPanel implements Runnable{
 					}
 				}
 				
+			}
+		}
+		else { // If dead
+			if (isBetween(mousePos[0],mousePos[1],100,100,100,100)) {
+				Thread a = new Thread(this);
+				party[0].hp = party[0].maxHp;
+				a.start();
+				System.out.println("Oh no");
+				mousePos[0] = 0;
+				mousePos[1] = 1;
 			}
 		}
 	}
@@ -441,6 +499,13 @@ public class Main extends JPanel implements Runnable{
 					g.fillRect(500, 350, enemy[enemyTurn].hp*100/enemy[enemyTurn].maxHp, 20);
 				}
 				g.setColor(Color.BLACK);
+				
+				//Party members
+				for(int i = 0; i < 4; i++)
+					if(party[i] != null)
+						g.drawString(party[i].name, 450, 40 + i * 11);
+					
+				
 				
 				for(int i = 0; i < 4; i++) { // for every slot
 					if(fruitSelect[i]!=null&&fruitSelect[i].sprite != null) // If the fruit exists
@@ -497,9 +562,11 @@ public class Main extends JPanel implements Runnable{
 		else {
 			
 			g.drawString("GAME OVER", 100,500);
+			
+			g.drawString("Try Again?", 100,100);
+			g.drawRect(100, 100, 100, 100);
 		}
 	}
-	
 	
 	public boolean isBetween(int posX, int posY, int x, int w, int y, int h) {
 		return (posX >= x && posX <= x + w && posY >= y && posY <= y + h);
@@ -543,28 +610,48 @@ public class Main extends JPanel implements Runnable{
 			
 	}
 	
-	public int setEnemy () {
+	public int setEnemy (boolean isTeam) {
 		int target = 0;
-		for(Enemy e : enemy) {
-			if(e.hp>0) {
-				break;
+		if(isTeam) {
+			for(Enemy e : enemy) {
+				if(e.hp>0) {
+					break;
+				}
+				target++;
 			}
-			target++;
+		}
+		else {
+			for(MainCharacter m : party) {
+				if(m.hp>0) {
+					break;
+				}
+				target++;
+			}
 		}
 		return target;
 	}
 
-	public Lambda attackSetUp(int turnA , Lambda l) {
+	public Lambda attackSetUp(int turnA , Lambda l, boolean isTeam) {
 		return (()->{
 			
-			target = setEnemy(); // Sets the target as the enemy
-			if(recipePlace!=-1 && turn < 4 && countDown[turn][recipePlace] == 0) {
-				l.interact();
-				countDown[turn][recipePlace] = turnA;
-				fruitSelect[selected] = null;
-			}
-
+			target = setEnemy(isTeam); // Sets the target as the enemy
 			
+			if(isTeam) {
+				if(recipePlace!=-1 && turn < 4 && countDown[turn][recipePlace] == 0) { // If recipe selected and is ready
+					l.interact(); // Do it
+					countDown[turn][recipePlace] = turnA; // Set number of turns
+					party[turn].use(fruitSelect[selected].name); // Use the fruit
+					fruitSelect[selected] = null; // take it out
+				}
+			}
+			else {
+				
+				if(countDownEnemy[turnEnemy][0] == 0) {
+					l.interact();
+					countDownEnemy[turnEnemy][0] = turnA;
+				}
+			
+			}
 		});
 	}
 
