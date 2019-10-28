@@ -55,7 +55,7 @@ public class Enemy extends Character{
 		for(int i = 0; i < 4; i++) {
 			if(recipes[i] != null) {
 				p.addRecipe(cookBookName.get(recipes[i]), recipes[i]);
-				p.recipes[i] = recipes[i];
+			//	p.recipes[i] = recipes[i];
 			}
 		}
 		p.setRecipes((cookBookName.containsKey(recipes[0]))?cookBookName.get(recipes[0]):"", (cookBookName.containsKey(recipes[1]))?cookBookName.get(recipes[1]):"", (cookBookName.containsKey(recipes[2]))?cookBookName.get(recipes[2]):"", (cookBookName.containsKey(recipes[3]))?cookBookName.get(recipes[3]):"");
