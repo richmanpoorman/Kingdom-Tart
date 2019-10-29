@@ -1,4 +1,4 @@
 
 public interface Lambda {
-	void interact();
+	void interact(Character character);
 }

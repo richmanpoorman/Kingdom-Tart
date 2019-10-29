@@ -20,10 +20,7 @@ public class Fruit {
 	public static HashMap<String, Fruit> dictionary = new HashMap<String, Fruit>();
 	
 	public Fruit(String name, String color, String flavor, BufferedImage sprite) {
-		this.name = name;
-		this.color = color;
-		this.flavor = flavor; 
-		this.sprite = sprite;
+		this(name, color, flavor, sprite, true);
 		if(!dictionary.containsKey(name)) {
 			dictionary.put(name, new Fruit(name,color,flavor,sprite,true));
 			

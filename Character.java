@@ -55,7 +55,7 @@ public class Character {
 
 	public void interact(Character tag, Lambda l) {
 		if (isContact(tag)) {
-			l.interact();
+			l.interact(tag);
 		}
 	}
 	

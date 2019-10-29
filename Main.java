@@ -1,4 +1,4 @@
-// // // //
+// // // // // HELLO
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -25,6 +25,7 @@ import javax.swing.JPanel;
 
 import javafx.scene.image.Image;
 
+/*
 public class Main extends JPanel implements Runnable{
 	//player
 	public MainCharacter player;
@@ -121,11 +122,8 @@ public class Main extends JPanel implements Runnable{
 		isEnemy = false;
 		enemy[0] = new Enemy ("John Adams", 0, 0, 100, 1, 10, 10, true); // Stock enemy
 		enemy[0].addRecipe("XYZ Affair", 
-				attackSetUp(3, ()->{
-						setEnemyParty(isEnemy)[0].hp -= setEnemyParty(!isEnemy)[0].dmg;
-				//		party[0].hp-=enemy[0].dmg;
-						System.out.println(isEnemy + " " + turn);
-					}
+				attackSetUp(3, ()->
+						setEnemyParty(isEnemy)[0].hp -= setEnemyParty(!isEnemy)[0].dmg
 				, isEnemy)
 		);
 		
@@ -429,16 +427,16 @@ public class Main extends JPanel implements Runnable{
 				
 			}
 			
-			/*
+			
 			 * 
 			 * NOT IN COMBAT
 			 * 
 			 * 
-			*/
+			
 			else { // Not in combat
 				
 				player.playerUpdate(pressed); // Momentary: creates a square where the Main Character is
-				/* TEST: Make enemies */
+				/* TEST: Make enemies 
 				int spawnChance = (int)(Math.random()*100);
 				
 				if(spawnChance <= 3) {
@@ -447,7 +445,7 @@ public class Main extends JPanel implements Runnable{
 					enemiesInField.add(e);
 					
 				}
-				/**/
+				
 				
 				for(Enemy e : enemiesInField) { // Check every enemy
 					// If contact
@@ -577,7 +575,7 @@ public class Main extends JPanel implements Runnable{
 		return (posX >= x && posX <= x + w && posY >= y && posY <= y + h);
 	}
 	
-	/* Returns an array of random fruit from the inventory */
+	/* Returns an array of random fruit from the inventory 
 	public Fruit[] getRandomFruit(int numOfFruit) {
 		
 		Fruit[] fruitArray = new Fruit[numOfFruit]; // Array to return
@@ -707,7 +705,7 @@ public class Main extends JPanel implements Runnable{
 		}
 	}
 	
-	/* Class to return images: stores images into "animations"  */
+	/* Class to return images: stores images into "animations"  
 	public class Animation{
 		public int frameCount = 0; // What frame it is on
 		
@@ -743,4 +741,28 @@ public class Main extends JPanel implements Runnable{
 		}
 	}
 
+}
+*/
+
+public class Main extends JPanel implements Runnable{
+	
+	
+	
+	public Main() {
+		
+	}
+	
+	public void paint() {
+		
+	}
+	
+	public void gameplay() {
+		
+	}
+	
+	public void run() {
+		
+	}
+	
+	
 }

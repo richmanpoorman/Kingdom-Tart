@@ -40,10 +40,10 @@ public class Enemy extends Character{
 	
 	// Set recipes
 	public void setRecipes(String a, String b, String c, String d) {
-		recipes[0] = (cookBook.containsKey(a))?cookBook.get(a):()->{};
-		recipes[1] = (cookBook.containsKey(b))?cookBook.get(b):()->{};
-		recipes[2] = (cookBook.containsKey(c))?cookBook.get(c):()->{};
-		recipes[3] = (cookBook.containsKey(d))?cookBook.get(d):()->{};
+		recipes[0] = (cookBook.containsKey(a))?cookBook.get(a):(e)->{};
+		recipes[1] = (cookBook.containsKey(b))?cookBook.get(b):(e)->{};
+		recipes[2] = (cookBook.containsKey(c))?cookBook.get(c):(e)->{};
+		recipes[3] = (cookBook.containsKey(d))?cookBook.get(d):(e)->{};
 	}
 	
 	
