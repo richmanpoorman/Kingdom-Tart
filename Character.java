@@ -14,11 +14,10 @@ import java.util.Set;
 
 public class Character {
 	//position
-	public int x;
-	public int y;
+	public int x, tx;
+	public int y, ty;
 	//size
-	public int width;
-	public int height;
+	public int width, height;
 	//stats
 	public int hp;
 	public int dmg;
@@ -40,6 +39,8 @@ public class Character {
 		this.height = height;
 		this.name = name;
 		this.maxHp = hp;
+		ty = y;
+		tx = x;
 	}
 		// For enemy/player
 	public Character (String name, int x, int y, int width, int height, int hp, int dmg, String colorSpecialty) {
@@ -49,8 +50,13 @@ public class Character {
 	
 	
 	public void move(int dx, int dy) {
-		x += dx;
-		y += dy;
+		tx += dx;
+		ty += dy;
+	}
+	
+	public void updateLocation(int posX, int posY) {
+		x = tx - posX;
+		y = ty - posY;
 	}
 	
 	public boolean isContact(Character character) {

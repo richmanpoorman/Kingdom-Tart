@@ -746,16 +746,23 @@ public class Main extends JPanel implements Runnable{
 
 public class Main extends JPanel implements Runnable{
 	
+	//Instance Variables
 	ArrayList<Button> buttons = new ArrayList<Button>(); // Stores all the buttons
-	
+	ArrayList<Enemy> enemiesInField = new ArrayList<Enemy>();
+	Set<Integer> pressed = new HashSet<Integer>(); // Stores all information about key inputs
+	ArrayList<MainCharacter> team = new ArrayList<MainCharacter>(); // All of the collected teammates
 	int mouseX = 0, mouseY = 0; // Stores mouse position
-	
+	int xPos = 0, yPos = 0; // Stores player location in the overworld
 	boolean isBattle = false; // Determines whether or not fighting
 	
+	// At the start
 	public Main() {
 		
 		// Allows the checking of the player input
 		addMouseListener(new MouseListener());
+		addKeyListener(new KeyListener());
+		setFocusable(true);
+		setDoubleBuffered(false);
 		
 		// MOMENTARY : Adds Test Buttons
 		buttons.add(new Button("",10,10,100,100));
@@ -766,33 +773,40 @@ public class Main extends JPanel implements Runnable{
 		t.start();
 	}
 	
+	// Images
 	public void paint(Graphics g) {
 		g.clearRect(0, 0, this.getWidth(),this.getHeight()); // Clears the screen every frame
+		g.drawImage(convert("Main Character.png"), getWidth() / 2 - 25, getHeight() / 2 - 50, 50 , 100,  this); // Draws the player at the center of the screen
 		
-		for(Button b : buttons) { // Draw every button with name
-			
-			
+		for(Button b : buttons) { // Draw every button
 			// MOMENTARY: DRAWS A RECT FOR THE BUTTON
-			if(b.isPressed)g.setColor(Color.RED);
-			else g.setColor(Color.BLUE);
-			g.fillRect(b.x, b.y, b.w, b.h); 
+			g.setColor(b.isPressed?Color.RED:Color.BLUE);
+			g.fillRect(b.x, b.y, b.w, b.h); // Draw rect for button
 			g.setColor(Color.BLACK);
-			g.drawString(b.name, b.x, b.y + b.h/2);
+			g.drawString(b.name, b.x, b.y + b.h/2); // Draw name of button
 		}
 	}
 	
+	// Scenes
 	public void worldExploration() { // For the overworld scene
-		for(int i = 0; i < buttons.size(); i ++) buttons.get(i).Pressed(); // Check for interactions in every button
+		for(int i = 0; i < buttons.size(); i ++) { // For every button ... 
+			buttons.get(i).updateLocation(); // Sets location relative to player
+			buttons.get(i).pressed(); // Check for interactions in every button
+		}
+		
+		
+		playerMove(5); // Move the player with WASD key input at a speed of 25 pixels / frame
+		
+		
 	}
-	
 	public void battle() { // for battling scene
 		
 	}
-	
 	public void menu() { // for menu scene
 		
 	}
 	
+	// Update
 	public void run() {
 		long beforeTime = System.currentTimeMillis();
 		
@@ -819,6 +833,45 @@ public class Main extends JPanel implements Runnable{
 		}
 	}
 	
+	// Methods
+	public BufferedImage convert (String f) { // Convert file name to an image
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File(f));
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+			throw new IllegalArgumentException();
+		}
+		return img;
+	}
+	public void playerMove(int speed) { // Move the player based on WASD controls and at the speed specified (speed = pixels / frame)
+		System.out.println(xPos + " , " + yPos);
+		if(pressed != null) {
+			for(Integer i : pressed) {
+				switch(i) {
+					case KeyEvent.VK_W:
+						yPos-=speed;
+						break;
+					case KeyEvent.VK_A:
+						xPos -=speed;
+						break;
+					case KeyEvent.VK_S:
+						yPos+=speed;
+						break;
+					case KeyEvent.VK_D:
+						xPos+=speed;
+						break;
+					default:
+						break;
+				}	
+			}
+		}
+	}
+	
+	//Subclasses
+	/* Class to store information about an animation in one place */
 	/* Class to return images: stores images into "animations"  */
 	public class Animation{
 		public int frameCount = 0; // What frame it is on
@@ -854,13 +907,13 @@ public class Main extends JPanel implements Runnable{
 			return frameCount == frames.size();
 		}
 	}
-	
+	/* Class for clickable buttons for menu/recipe */
 	/* Subclass of Button : used for anything that is clicked by the player */
 	public class Button {
 		
 		// Instance Variables
-		public int x, y, w, h; // Location and dimension variable
-		
+		public int x, y, w, h; // Location relative to player and dimension variable
+		private int tx,ty; // Stores absolute location
 		public String name; // Name of button
 		public boolean isPressed; // Whether or not activated
 		public Fruit[] fruitCollected; // Storage of the fruit used
@@ -869,10 +922,12 @@ public class Main extends JPanel implements Runnable{
 		
 		// Constructors
 		public Button(String name, int x, int y, int w, int h) { // For Menu/Overworld
-			this.x = x;
-			this.y = y;
+			this.tx = x;
+			this.ty = y;
 			this.w = w;
 			this.h = h;
+			this.x = tx - xPos;
+			this.y = y - yPos;
 			isPressed = false;
 			this.name = name;
 			
@@ -885,9 +940,12 @@ public class Main extends JPanel implements Runnable{
 		}
 		
 		// Methods
-		public void Pressed() { // Checks if the button is pressed
-			if(mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h)isPressed = true;
-			else isPressed = false;
+		public void updateLocation() {
+			x = tx - xPos;
+			y = ty - yPos;
+		}
+		public void pressed() { // Checks if the button is pressed
+			isPressed = (mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h);
 		}
 		public boolean addFruit(Fruit fruit) { // Adds fruit if combat selection : returns false if not full, returns true if array is full
 			if(numOfFruitCollected < fruitCollected.length) {
@@ -904,6 +962,7 @@ public class Main extends JPanel implements Runnable{
 		}
 		public void setRecipe(Lambda l, int countDown) { // Changes the recipe
 			recipe = l;
+			name = MainCharacter.cookBookName.get(recipe);
 			if(countDown>=0) {
 				countDownInitial = countDown;
 				this.countDown = countDown;
@@ -921,17 +980,20 @@ public class Main extends JPanel implements Runnable{
 		}
 	
 	}
-	
-	public BufferedImage convert (String f) {
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(new File(f));
+	/* Checks the keyboard inputs */
+	private class KeyListener extends KeyAdapter{
+		@Override
+		public synchronized void keyPressed(KeyEvent e) {
+			System.out.println("Press"); // Test the Key Function
+			pressed.add(e.getKeyCode());
 		}
-		catch(IOException e)
-		{}
-		return img;
+
+		@Override
+		public synchronized void keyReleased(KeyEvent e) {
+			pressed.remove(e.getKeyCode());
+		}
+		
 	}
-	
 	/* Checks the mouse inputs */
 	private class MouseListener extends MouseAdapter{
 		@Override

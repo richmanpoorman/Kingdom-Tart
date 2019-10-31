@@ -52,7 +52,7 @@ public class MainCharacter extends Character{
 		recipes[2] = (cookBook.containsKey(c))?cookBook.get(c):(e)->{};
 		recipes[3] = (cookBook.containsKey(d))?cookBook.get(d):(e)->{};
 	}
-	
+	/*
 	public void playerUpdate(Set<Integer> pressed) {
 		if(pressed != null) {
 			for(Integer i : pressed) {
@@ -85,5 +85,5 @@ public class MainCharacter extends Character{
 				}	
 			}
 		}
-	}
+	}*/
 }
