@@ -25,9 +25,12 @@ public class Character {
 	public String name;
 	public int maxHp;
 	
+	public String colorSpecialty;
+	
 	public boolean isTeam;
 	
 	//Constructor
+		// General
 	public Character (String name, int x, int y, int width, int height, int hp, int dmg) {
 		this.x = x;
 		this.y = y;
@@ -38,6 +41,12 @@ public class Character {
 		this.name = name;
 		this.maxHp = hp;
 	}
+		// For enemy/player
+	public Character (String name, int x, int y, int width, int height, int hp, int dmg, String colorSpecialty) {
+		this(name, x, y, width, height, hp, dmg);
+		this.colorSpecialty = colorSpecialty;
+	}
+	
 	
 	public void move(int dx, int dy) {
 		x += dx;

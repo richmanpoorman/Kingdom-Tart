@@ -746,23 +746,206 @@ public class Main extends JPanel implements Runnable{
 
 public class Main extends JPanel implements Runnable{
 	
+	ArrayList<Button> buttons = new ArrayList<Button>(); // Stores all the buttons
 	
+	int mouseX = 0, mouseY = 0; // Stores mouse position
+	
+	boolean isBattle = false; // Determines whether or not fighting
 	
 	public Main() {
 		
+		// Allows the checking of the player input
+		addMouseListener(new MouseListener());
+		
+		// MOMENTARY : Adds Test Buttons
+		buttons.add(new Button("",10,10,100,100));
+		buttons.add(new Button ("  A " , 120, 10, 100, 100, 2, 2));
+		
+		//Starts the program
+		Thread t = new Thread(this);
+		t.start();
 	}
 	
-	public void paint() {
+	public void paint(Graphics g) {
+		g.clearRect(0, 0, this.getWidth(),this.getHeight()); // Clears the screen every frame
+		
+		for(Button b : buttons) { // Draw every button with name
+			
+			
+			// MOMENTARY: DRAWS A RECT FOR THE BUTTON
+			if(b.isPressed)g.setColor(Color.RED);
+			else g.setColor(Color.BLUE);
+			g.fillRect(b.x, b.y, b.w, b.h); 
+			g.setColor(Color.BLACK);
+			g.drawString(b.name, b.x, b.y + b.h/2);
+		}
+	}
+	
+	public void worldExploration() { // For the overworld scene
+		for(int i = 0; i < buttons.size(); i ++) buttons.get(i).Pressed(); // Check for interactions in every button
+	}
+	
+	public void battle() { // for battling scene
 		
 	}
 	
-	public void gameplay() {
+	public void menu() { // for menu scene
 		
 	}
 	
 	public void run() {
+		long beforeTime = System.currentTimeMillis();
 		
+		while (true) {
+			
+			long timeDiff = System.currentTimeMillis() - beforeTime;
+			beforeTime = System.currentTimeMillis();
+			long sleep = 30 - timeDiff;
+			
+			// Determines whether battling or not
+			if(isBattle)battle();
+			else worldExploration();
+			
+			repaint(); // Paints the frame (images)
+			if (sleep < 2) {
+
+				sleep = 2;
+			}
+			try {
+				Thread.sleep(sleep);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
+	/* Class to return images: stores images into "animations"  */
+	public class Animation{
+		public int frameCount = 0; // What frame it is on
+		
+		public ArrayList<BufferedImage> frames = new ArrayList<BufferedImage>(); // All the frames
+		
+		//Constructor
+		public Animation(ArrayList<BufferedImage> frames) {
+			this.frames = frames;	
+		}
+		
+		
+		public void reset () {// Returns the animation back to frame one
+			frameCount = 0;
+		}
+		
+		public BufferedImage play(boolean isLoop) { // Returns an image at each frame ( is played in run ) 
+			if(frames.size() < frameCount) { // Returns all the frames before the 
+				frameCount++;
+				return frames.get(frameCount-1);
+				
+			}
+			else if (isLoop) { // Checks if the animation wants to loop
+				frameCount = 0;
+			}
+			
+			return frames.get(frames.size()-1);	// Play the last frame
+			
+				
+		}
+		
+		public boolean isPlayed () { // Tests if animation is finished
+			return frameCount == frames.size();
+		}
+	}
 	
+	/* Subclass of Button : used for anything that is clicked by the player */
+	public class Button {
+		
+		// Instance Variables
+		public int x, y, w, h; // Location and dimension variable
+		
+		public String name; // Name of button
+		public boolean isPressed; // Whether or not activated
+		public Fruit[] fruitCollected; // Storage of the fruit used
+		private int numOfFruitCollected, countDown, countDownInitial; // Number of fruit inputed into the button
+		private Lambda recipe; // Recipe for combat
+		
+		// Constructors
+		public Button(String name, int x, int y, int w, int h) { // For Menu/Overworld
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+			isPressed = false;
+			this.name = name;
+			
+		}		
+		public Button(String name, int x, int y, int w, int h, int numOfFruit, int countDown) { // For combat selection
+			this(name, x,y,w,h);
+			fruitCollected = new Fruit[numOfFruit];
+			this.countDown = countDown;
+			countDownInitial = countDown;
+		}
+		
+		// Methods
+		public void Pressed() { // Checks if the button is pressed
+			if(mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h)isPressed = true;
+			else isPressed = false;
+		}
+		public boolean addFruit(Fruit fruit) { // Adds fruit if combat selection : returns false if not full, returns true if array is full
+			if(numOfFruitCollected < fruitCollected.length) {
+				fruitCollected[numOfFruitCollected] = fruit;
+				numOfFruitCollected++;
+			}
+			return fruitCollected.length == numOfFruitCollected; 
+		}
+		public void resetFruit() { // Sets every value in the fruitCollected array to null ; clears out the array
+			for(int i = 0; i < fruitCollected.length;i++)fruitCollected[i] = null;
+		}
+		public void useRecipe(Character e) { // Uses recipe set
+			if(recipe!=null)recipe.interact(e);
+		}
+		public void setRecipe(Lambda l, int countDown) { // Changes the recipe
+			recipe = l;
+			if(countDown>=0) {
+				countDownInitial = countDown;
+				this.countDown = countDown;
+			}
+		}
+		public boolean isFinishCountdown() { // FIX LATER ::
+			if(countDown == 0) {
+				countDown = countDownInitial;
+				return true;
+			}
+			else {
+				countDown--;
+				return false;
+			}
+		}
+	
+	}
+	
+	public BufferedImage convert (String f) {
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File(f));
+		}
+		catch(IOException e)
+		{}
+		return img;
+	}
+	
+	/* Checks the mouse inputs */
+	private class MouseListener extends MouseAdapter{
+		@Override
+		public void mousePressed(MouseEvent e) { // When clicked, mouseX and mouseY are set
+			mouseX = e.getX();
+			mouseY = e.getY();
+			
+		}
+	
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			mouseX = 0;
+			mouseY = 0;
+
+		}
+	}
 }

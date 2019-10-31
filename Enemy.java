@@ -14,8 +14,8 @@ public class Enemy extends Character{
 	
 	
 	//Constructors
-	public Enemy(String name, int x, int y, int hp, int dmg, int width, int height) {
-		super(name, x, y, width, height, hp, dmg);
+	public Enemy(String name, int x, int y, int hp, int dmg, int width, int height, String colorSpecialty) {
+		super(name, x, y, width, height, hp, dmg, colorSpecialty);
 	//	this.attack = l;
 		index++;
 		isTeam = false;
@@ -26,11 +26,11 @@ public class Enemy extends Character{
 		isTeam = false;
 	}
 	//Prevent recursion
-	public Enemy(String name, int x, int y, int hp, int dmg, int width, int height,boolean a) {
+	public Enemy(String name, int x, int y, int hp, int dmg, int width, int height, String colorSpecialty,boolean a) {
 		super(name, x, y, width, height, hp, dmg);
 		isTeam = false;
 		if(dictionary.containsKey(name) == false);
-			dictionary.put(name, new Enemy(name, 0, 0, hp, dmg, width, height));
+			dictionary.put(name, new Enemy(name, 0, 0, hp, dmg, width, height, colorSpecialty));
 	}
 	public void addRecipe(String name, Lambda l) {
 		cookBook.put(name,l);
@@ -50,7 +50,7 @@ public class Enemy extends Character{
 	
 	//Join Party
 	public MainCharacter joinParty() {
-		MainCharacter p = new MainCharacter(name,x,y,maxHp,dmg,width,height);
+		MainCharacter p = new MainCharacter(name,x,y,maxHp,dmg,width,height, colorSpecialty);
 		this.isTeam = true;
 		for(int i = 0; i < 4; i++) {
 			if(recipes[i] != null) {

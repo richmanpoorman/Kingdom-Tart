@@ -21,8 +21,8 @@ public class MainCharacter extends Character{
 	public Lambda[] recipes = new Lambda[4];
 	public int speed = 5;
 	
-	public MainCharacter(String name, int x, int y, int hp, int dmg, int width, int height) {
-		super(name, x, y, width, height, hp, dmg);
+	public MainCharacter(String name, int x, int y, int hp, int dmg, int width, int height, String colorSpecialty) {
+		super(name, x, y, width, height, hp, dmg, colorSpecialty);
 		isTeam = true;
 	}
 	
