@@ -753,7 +753,7 @@ public class Main extends JPanel implements Runnable{
 	ArrayList<MainCharacter> team = new ArrayList<MainCharacter>(); // All of the collected teammates
 	int mouseX = 0, mouseY = 0; // Stores mouse position
 	int xPos = 0, yPos = 0; // Stores player location in the overworld
-	boolean isBattle = false; // Determines whether or not fighting
+	boolean isBattle = false, isMenu = false; // Determines whether or not fighting/in the menu
 	
 	// At the start
 	public Main() {
@@ -764,9 +764,10 @@ public class Main extends JPanel implements Runnable{
 		setFocusable(true);
 		setDoubleBuffered(false);
 		
-		// MOMENTARY : Adds Test Buttons
+		// MOMENTARY : Adds Test Buttons/Enemies
 		buttons.add(new Button("",10,10,100,100));
 		buttons.add(new Button ("  A " , 120, 10, 100, 100, 2, 2));
+		enemiesInField.add(new Enemy("", 100, 100, 100, 100,100,100,""));
 		
 		//Starts the program
 		Thread t = new Thread(this);
@@ -776,15 +777,12 @@ public class Main extends JPanel implements Runnable{
 	// Images
 	public void paint(Graphics g) {
 		g.clearRect(0, 0, this.getWidth(),this.getHeight()); // Clears the screen every frame
-		g.drawImage(convert("Main Character.png"), getWidth() / 2 - 25, getHeight() / 2 - 50, 50 , 100,  this); // Draws the player at the center of the screen
 		
-		for(Button b : buttons) { // Draw every button
-			// MOMENTARY: DRAWS A RECT FOR THE BUTTON
-			g.setColor(b.isPressed?Color.RED:Color.BLUE);
-			g.fillRect(b.x, b.y, b.w, b.h); // Draw rect for button
-			g.setColor(Color.BLACK);
-			g.drawString(b.name, b.x, b.y + b.h/2); // Draw name of button
-		}
+		// Determines whether battling or not
+		if(isMenu)menuGraphics(g);
+		else if(isBattle)battleGraphics(g);
+		else worldExplorationGraphics(g);
+		
 	}
 	
 	// Scenes
@@ -797,12 +795,40 @@ public class Main extends JPanel implements Runnable{
 		
 		playerMove(5); // Move the player with WASD key input at a speed of 25 pixels / frame
 		
-		
+		for (int i = 0; i < enemiesInField.size(); i++) { // For every enemy...
+			enemiesInField.get(i).updateLocation(xPos, yPos, this);
+			
+			if(enemiesInField.get(i).isContact(xPos, yPos, 50, 100))isBattle = true; // Checks if in contact with enemy, and if so, enter battle
+			System.out.println(enemiesInField.get(i).isContact(xPos, yPos, 50, 100));
+		}
 	}
 	public void battle() { // for battling scene
 		
 	}
 	public void menu() { // for menu scene
+		
+	}
+	
+	// Scene Graphics
+	public void worldExplorationGraphics(Graphics g) {
+		g.drawImage(convert("Main Character.png"), getWidth() / 2, getHeight() / 2, 50 , 100,  this); // Draws the player at the center of the screen
+		
+		for(Button b : buttons) { // Draw every button
+			// MOMENTARY: DRAWS A RECT FOR THE BUTTON
+			g.setColor(b.isPressed?Color.RED:Color.BLUE);
+			g.fillRect(b.x, b.y, b.w, b.h); // Draw rect for button
+			g.setColor(Color.BLACK);
+			g.drawString(b.name, b.x, b.y + b.h/2); // Draw name of button
+		}
+		
+		for (Enemy e : enemiesInField) {
+			g.fillRect(e.x, e.y, e.width, e.height);
+		}
+	}
+	public void battleGraphics(Graphics g) {
+		
+	}
+	public void menuGraphics(Graphics g) {
 		
 	}
 	
@@ -817,7 +843,8 @@ public class Main extends JPanel implements Runnable{
 			long sleep = 30 - timeDiff;
 			
 			// Determines whether battling or not
-			if(isBattle)battle();
+			if(isMenu)menu();
+			else if(isBattle)battle();
 			else worldExploration();
 			
 			repaint(); // Paints the frame (images)
@@ -847,7 +874,7 @@ public class Main extends JPanel implements Runnable{
 		return img;
 	}
 	public void playerMove(int speed) { // Move the player based on WASD controls and at the speed specified (speed = pixels / frame)
-		System.out.println(xPos + " , " + yPos);
+	//	System.out.println(xPos + " , " + yPos); // TEST: Locations
 		if(pressed != null) {
 			for(Integer i : pressed) {
 				switch(i) {
@@ -941,8 +968,8 @@ public class Main extends JPanel implements Runnable{
 		
 		// Methods
 		public void updateLocation() {
-			x = tx - xPos;
-			y = ty - yPos;
+			x = tx - xPos + getWidth()/2;
+			y = ty - yPos + getHeight()/2;
 		}
 		public void pressed() { // Checks if the button is pressed
 			isPressed = (mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h);
@@ -984,7 +1011,7 @@ public class Main extends JPanel implements Runnable{
 	private class KeyListener extends KeyAdapter{
 		@Override
 		public synchronized void keyPressed(KeyEvent e) {
-			System.out.println("Press"); // Test the Key Function
+		//	System.out.println("Press"); // Test the Key Function
 			pressed.add(e.getKeyCode());
 		}
 

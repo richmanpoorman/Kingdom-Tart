@@ -6,6 +6,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
 import javax.imageio.ImageIO;
+import javax.swing.JPanel;
+
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -54,18 +56,25 @@ public class Character {
 		ty += dy;
 	}
 	
-	public void updateLocation(int posX, int posY) {
-		x = tx - posX;
-		y = ty - posY;
+	public void updateLocation(int posX, int posY, JPanel observer) {
+		x = tx - posX + (observer.getWidth()/2);
+		y = ty - posY + (observer.getHeight()/2);
 	}
 	
 	public boolean isContact(Character character) {
 		return(
-				x+width >= character.x && 
-				x<= character.x+character.width &&
-				y+height >= character.x &&
-				x<= character.y+character.height
+				tx+width >= character.tx && 
+				tx<= character.tx+character.width &&
+				ty+height >= character.tx &&
+				tx<= character.ty+character.height
 			  );
+	}
+	
+	public boolean isContact(int ax, int ay, int w, int h) {
+		return (ax <= tx + width &&
+				ax + w >= tx &&
+				ay <= ty + height &&
+				ay + h >= ty);
 	}
 
 	public void interact(Character tag, Lambda l) {

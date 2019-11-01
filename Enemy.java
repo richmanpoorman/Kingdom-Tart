@@ -14,7 +14,7 @@ public class Enemy extends Character{
 	
 	
 	//Constructors
-	public Enemy(String name, int x, int y, int hp, int dmg, int width, int height, String colorSpecialty) {
+	public Enemy(String name, int x, int y, int width, int height, int hp, int dmg, String colorSpecialty) {
 		super(name, x, y, width, height, hp, dmg, colorSpecialty);
 	//	this.attack = l;
 		index++;
