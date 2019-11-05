@@ -63,18 +63,18 @@ public class Character {
 	
 	public boolean isContact(Character character) {
 		return(
-				tx+width >= character.tx && 
-				tx<= character.tx+character.width &&
-				ty+height >= character.tx &&
-				tx<= character.ty+character.height
+				tx + width/2 >= character.tx && 
+				tx - width/2<= character.tx+character.width &&
+				ty + height/2 >= character.tx &&
+				ty - height/2<= character.ty+character.height
 			  );
 	}
 	
 	public boolean isContact(int ax, int ay, int w, int h) {
-		return (ax <= tx + width &&
-				ax + w >= tx &&
-				ay <= ty + height &&
-				ay + h >= ty);
+		return (ax - w/2<= tx + width &&
+				ax + w/2 >= tx &&
+				ay - h/2<= ty + height &&
+				ay + h/2 >= ty);
 	}
 
 	public void interact(Character tag, Lambda l) {

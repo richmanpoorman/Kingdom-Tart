@@ -747,13 +747,17 @@ public class Main extends JPanel implements Runnable{
 public class Main extends JPanel implements Runnable{
 	
 	//Instance Variables
-	ArrayList<Button> buttons = new ArrayList<Button>(); // Stores all the buttons
+	ArrayList<Button> buttonsAll = new ArrayList<Button>(); // Stores all the buttons for every
+	ArrayList<Button> buttonsMenu = new ArrayList<Button>(); // Stores all the buttons for the menu
+	ArrayList<Button> buttonsBattle = new ArrayList<Button>(); // Stores all the buttons for the battling
+	ArrayList<Button> buttonsOverworld = new ArrayList<Button>(); // Stores all the buttons for the overworld
 	ArrayList<Enemy> enemiesInField = new ArrayList<Enemy>();
 	Set<Integer> pressed = new HashSet<Integer>(); // Stores all information about key inputs
 	ArrayList<MainCharacter> team = new ArrayList<MainCharacter>(); // All of the collected teammates
 	int mouseX = 0, mouseY = 0; // Stores mouse position
 	int xPos = 0, yPos = 0; // Stores player location in the overworld
 	boolean isBattle = false, isMenu = false; // Determines whether or not fighting/in the menu
+	boolean isPressedOverall = false; // Whether pressed down
 	
 	// At the start
 	public Main() {
@@ -764,9 +768,15 @@ public class Main extends JPanel implements Runnable{
 		setFocusable(true);
 		setDoubleBuffered(false);
 		
+		// Add menu button
+		Button b = new Button("Menu",10,10,100,20);
+		b.setUsage(()->isMenu = !isMenu);
+		buttonsAll.add(b);
+		
+		
 		// MOMENTARY : Adds Test Buttons/Enemies
-		buttons.add(new Button("",10,10,100,100));
-		buttons.add(new Button ("  A " , 120, 10, 100, 100, 2, 2));
+		buttonsMenu.add(new Button("",10,110,100,100));
+		buttonsMenu.add(new Button ("  A " , 120, 110, 100, 100, 2, 2));
 		enemiesInField.add(new Enemy("", 100, 100, 100, 100,100,100,""));
 		
 		//Starts the program
@@ -778,6 +788,8 @@ public class Main extends JPanel implements Runnable{
 	public void paint(Graphics g) {
 		g.clearRect(0, 0, this.getWidth(),this.getHeight()); // Clears the screen every frame
 		
+		// g.drawRect(10, 10, 100, 20); // Menu button // MOMENTARY
+		
 		// Determines whether battling or not
 		if(isMenu)menuGraphics(g);
 		else if(isBattle)battleGraphics(g);
@@ -787,9 +799,13 @@ public class Main extends JPanel implements Runnable{
 	
 	// Scenes
 	public void worldExploration() { // For the overworld scene
-		for(int i = 0; i < buttons.size(); i ++) { // For every button ... 
-			buttons.get(i).updateLocation(); // Sets location relative to player
-			buttons.get(i).pressed(); // Check for interactions in every button
+		for(int i = 0; i < buttonsOverworld.size(); i++) { // For all world exploration button ...
+			buttonsOverworld.get(i).pressed(); // Update buttons
+			if(buttonsOverworld.get(i).isPressed) buttonsOverworld.get(i).useUsage(); // If pressed, use it
+		}
+		for(int i = 0; i < buttonsAll.size(); i++) { // For all universal button ...
+			buttonsAll.get(i).pressed(); // Update buttons
+			if(buttonsAll.get(i).isPressed) buttonsAll.get(i).useUsage(); // If pressed, use it
 		}
 		
 		
@@ -798,37 +814,87 @@ public class Main extends JPanel implements Runnable{
 		for (int i = 0; i < enemiesInField.size(); i++) { // For every enemy...
 			enemiesInField.get(i).updateLocation(xPos, yPos, this);
 			
-			if(enemiesInField.get(i).isContact(xPos, yPos, 50, 100))isBattle = true; // Checks if in contact with enemy, and if so, enter battle
-			System.out.println(enemiesInField.get(i).isContact(xPos, yPos, 50, 100));
+			if(enemiesInField.get(i).isContact(xPos, yPos, 50, 100)) {  // Checks if in contact with enemy
+				isBattle = true; // Enter battle
+			}
+		//	System.out.println(enemiesInField.get(i).isContact(xPos, yPos, 50, 100)); // MOMENTARY: if is contact
 		}
 	}
 	public void battle() { // for battling scene
+		for(int i = 0; i < buttonsBattle.size(); i++) { // For all battle choice button ...
+			buttonsBattle.get(i).pressed(); // Update buttons
+			if(buttonsBattle.get(i).isPressed) buttonsBattle.get(i).useUsage(); // If pressed, use it
+		}
+		for(int i = 0; i < buttonsAll.size(); i++) { // For all universal button ...
+			buttonsAll.get(i).pressed(); // Update buttons
+			if(buttonsAll.get(i).isPressed) buttonsAll.get(i).useUsage(); // If pressed, use it
+		}
+		
 		
 	}
 	public void menu() { // for menu scene
-		
+		for(int i = 0; i < buttonsMenu.size(); i++) { // For all menu button ...
+			buttonsMenu.get(i).pressed(); // Update buttons
+			if(buttonsMenu.get(i).isPressed) buttonsMenu.get(i).useUsage(); // If pressed, use it
+		}
+		for(int i = 0; i < buttonsAll.size(); i++) { // For all universal button ...
+			buttonsAll.get(i).pressed(); // Update buttons
+			if(buttonsAll.get(i).isPressed) buttonsAll.get(i).useUsage(); // If pressed, use it
+		}
 	}
 	
 	// Scene Graphics
 	public void worldExplorationGraphics(Graphics g) {
-		g.drawImage(convert("Main Character.png"), getWidth() / 2, getHeight() / 2, 50 , 100,  this); // Draws the player at the center of the screen
-		
-		for(Button b : buttons) { // Draw every button
-			// MOMENTARY: DRAWS A RECT FOR THE BUTTON
-			g.setColor(b.isPressed?Color.RED:Color.BLUE);
-			g.fillRect(b.x, b.y, b.w, b.h); // Draw rect for button
+		for(Button b : buttonsOverworld) {
+			if(b.isPressed)g.setColor(Color.RED); else g.setColor(Color.BLUE);
+			g.fillRect(b.x, b.y, b.w, b.h);
 			g.setColor(Color.BLACK);
-			g.drawString(b.name, b.x, b.y + b.h/2); // Draw name of button
+			g.drawString(b.name, b.x, b.y + b.h/2);
+		}
+		for(Button b : buttonsAll) {
+			if(b.isPressed)g.setColor(Color.RED); else g.setColor(Color.ORANGE);
+			g.fillRect(b.x, b.y, b.w, b.h);
+			g.setColor(Color.BLACK);
+			g.drawString(b.name, b.x, b.y + b.h/2);
 		}
 		
+		g.drawImage(convert("Main Character.png"), getWidth() / 2 - 25, getHeight() / 2 - 50, 50 , 100,  this); // Draws the player at the center of the screen
+		
 		for (Enemy e : enemiesInField) {
+			
 			g.fillRect(e.x, e.y, e.width, e.height);
 		}
 	}
 	public void battleGraphics(Graphics g) {
+		for(Button b : buttonsBattle) {
+			if(b.isPressed)g.setColor(Color.RED); else g.setColor(Color.BLUE);
+			g.fillRect(b.x, b.y, b.w, b.h);
+			g.setColor(Color.BLACK);
+			g.drawString(b.name, b.x, b.y + b.h/2);
+		}
+		for(Button b : buttonsAll) {
+			if(b.isPressed)g.setColor(Color.RED); else g.setColor(Color.ORANGE);
+			g.fillRect(b.x, b.y, b.w, b.h);
+			g.setColor(Color.BLACK);
+			g.drawString(b.name, b.x, b.y + b.h/2);
+		}
+		
 		
 	}
 	public void menuGraphics(Graphics g) {
+		for(Button b : buttonsMenu) {
+			if(b.isPressed)g.setColor(Color.RED); else g.setColor(Color.BLUE);
+			g.fillRect(b.x, b.y, b.w, b.h);
+			g.setColor(Color.BLACK);
+			g.drawString(b.name, b.x, b.y + b.h/2);
+		}
+		for(Button b : buttonsAll) {
+			if(b.isPressed)g.setColor(Color.RED); else g.setColor(Color.ORANGE);
+			g.fillRect(b.x, b.y, b.w, b.h);
+			g.setColor(Color.BLACK);
+			g.drawString(b.name, b.x, b.y + b.h/2);
+		}
+		
 		
 	}
 	
@@ -944,8 +1010,11 @@ public class Main extends JPanel implements Runnable{
 		public String name; // Name of button
 		public boolean isPressed; // Whether or not activated
 		public Fruit[] fruitCollected; // Storage of the fruit used
+		
 		private int numOfFruitCollected, countDown, countDownInitial; // Number of fruit inputed into the button
 		private Lambda recipe; // Recipe for combat
+		private Lambda2 usage;
+		
 		
 		// Constructors
 		public Button(String name, int x, int y, int w, int h) { // For Menu/Overworld
@@ -983,6 +1052,16 @@ public class Main extends JPanel implements Runnable{
 		}
 		public void resetFruit() { // Sets every value in the fruitCollected array to null ; clears out the array
 			for(int i = 0; i < fruitCollected.length;i++)fruitCollected[i] = null;
+		}
+		public void useUsage() {
+			
+			if(isPressedOverall&&usage!=null) {
+				usage.interact();
+				isPressedOverall = false;
+			}
+		}
+		public void setUsage(Lambda2 l) {
+			usage = l;
 		}
 		public void useRecipe(Character e) { // Uses recipe set
 			if(recipe!=null)recipe.interact(e);
@@ -1027,14 +1106,14 @@ public class Main extends JPanel implements Runnable{
 		public void mousePressed(MouseEvent e) { // When clicked, mouseX and mouseY are set
 			mouseX = e.getX();
 			mouseY = e.getY();
-			
+			isPressedOverall = true;
 		}
 	
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			mouseX = 0;
 			mouseY = 0;
-
+			isPressedOverall = false;
 		}
 	}
 }
