@@ -52,38 +52,5 @@ public class MainCharacter extends Character{
 		recipes[2] = (cookBook.containsKey(c))?cookBook.get(c):(e)->{};
 		recipes[3] = (cookBook.containsKey(d))?cookBook.get(d):(e)->{};
 	}
-	/*
-	public void playerUpdate(Set<Integer> pressed) {
-		if(pressed != null) {
-			for(Integer i : pressed) {
-				
-				switch(i) {
-				
-					case KeyEvent.VK_W:
-						
-						y-=speed;
-						
-						break;
-					
-					case KeyEvent.VK_A:
-						
-						x -=speed;
-						
-						break;
-						
-					case KeyEvent.VK_S:
-						
-						y+=speed;
-						
-						break;
-					case KeyEvent.VK_D:
-						x+=speed;
-						break;
-					default:
-						
-						break;
-				}	
-			}
-		}
-	}*/
+
 }
