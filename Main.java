@@ -750,8 +750,10 @@ public class Main extends JPanel implements Runnable{
 	ArrayList<Button> buttonsAll = new ArrayList<Button>(); // Stores all the buttons for every
 	ArrayList<Button> buttonsMenu = new ArrayList<Button>(); // Stores all the buttons for the menu
 	ArrayList<Button> buttonsBattle = new ArrayList<Button>(); // Stores all the buttons for the battling
+	Button[][] recipeButtons = new Button[4][4];
 	ArrayList<Button> buttonsOverworld = new ArrayList<Button>(); // Stores all the buttons for the overworld
 	ArrayList<Enemy> enemiesInField = new ArrayList<Enemy>();
+	HashSet<Enemy> enemiesInBattle = new HashSet<Enemy>(); 
 	Set<Integer> pressed = new HashSet<Integer>(); // Stores all information about key inputs
 	ArrayList<MainCharacter> team = new ArrayList<MainCharacter>(); // All of the collected teammates
 	MainCharacter[] battleParty = new MainCharacter[4]; // The party used in battle
@@ -776,8 +778,48 @@ public class Main extends JPanel implements Runnable{
 		a.setUsage(()->isMenu = !isMenu);
 		buttonsAll.add(a);
 		
-		//Add battling buttons
-		for(int o = 0; o < 4; o++) for(int i = 0; i < 4; i++)buttonsBattle.add(new Button(i +", "+o,10 + 210*i,400,200,100)); // Adds four sets of four blank buttons for the recipes
+		//Add four blank recipe buttons
+		for(int o = 0; o < 4; o++) {
+			for(int i = 0; i < 4; i++) {
+				Button z = new Button(i +", "+o,10 + 210*i,400,200,100);
+				z.setUsage(()->System.out.println(z.name + " PRESSED")); // MOMENTARY : TEST WHETHER BUTTON IS PRESSED IN RECIPES (IF NOT SET)
+				recipeButtons[o][i] = z; // Adds four sets of four blank buttons for the recipes
+			}
+		}
+		
+		// MOMENTARY : Add Fruit to the player inventory
+		Fruit[] setUp =  {
+			new Fruit("Strawberry","Red","Sweet",convert("Strawberry.png")),
+			new Fruit("Pineapple","Yellow","Sweet",convert("Pinapple.png")),
+			new Fruit("Apple","Green","Sweet",convert("Apple.png")),
+			new Fruit("Banana","Yellow","Savory",convert("Banana.png")),
+			new Fruit("Blueberry","Blue","Sweet",convert("Blueberry.png")),
+			new Fruit("Carrot","Orange","Savory",convert("Carrot.png")),
+			new Fruit("Grapes","Purple","Savory",convert("Grapes.png")),
+			new Fruit("Kiwi","Green","Sweet",convert("Kiwi.png")),
+			new Fruit("Lemon","Yellow","Sour",convert("Lemon.png")),
+			new Fruit("Orange","Orange","Savory",convert("Orange.png")),
+			new Fruit("Pumpkin","Orange","Savory",convert("Pumpkin.png"))
+		};
+		for(Fruit f : setUp) {
+			MainCharacter.inventory.put(f, 5);
+		}
+		
+		// Add Fruit Buttons 
+		for(int i = 0; i < 4; i++) {
+			Button a1 = new Button("", 10 + 110 * i, 100, 100 , 100, MainCharacter.getRandomFruit());
+			a1.setUsage(()->MainCharacter.use(a1.displayFruit));
+			buttonsBattle.add(a1);
+		}
+		
+		// Add End Turn button in battle
+		Button b = new Button("End Turn", 860, 400, 200, 100);
+		b.setUsage(()->turn++);
+		buttonsBattle.add(b);
+		
+		// Add first character to party
+		battleParty[0] = new MainCharacter("",0,0,12,12,12,12,"");
+		for(int i = 0; i < 4; i++) recipeButtons[0][i].setRecipe(battleParty[0].recipes[i],1);
 		
 		// MOMENTARY : Adds Test Buttons/Enemies
 		buttonsMenu.add(new Button("",10,110,100,100));
@@ -821,28 +863,44 @@ public class Main extends JPanel implements Runnable{
 			
 			if(enemiesInField.get(i).isContact(xPos, yPos, 50, 100)) {  // Checks if in contact with enemy
 				isBattle = true; // Enter battle
+				enemiesInBattle.add(enemiesInField.get(i));
 			}
-		//	System.out.println(enemiesInField.get(i).isContact(xPos, yPos, 50, 100)); // MOMENTARY: if is contact
 		}
 	}
 	public void battle() { // for battling scene
-		
+		for(Button b : buttonsBattle) { // Check if the universal buttons is selected
+			b.pressed();
+			if(b.isPressed) b.useUsage();
+		}
 		for(Button b : buttonsAll) { // Check if the universal buttons is selected
 			b.pressed();
 			if(b.isPressed) b.useUsage();
 		}
 		
+		
 		if(isTurn) { // Your turn
-			for(int i = 0; i < 4; i++) { // Draw all buttons associated with the party member whose turn it is
-				buttonsBattle.get(i + turn * 4).pressed();
-				if(buttonsBattle.get(i + turn * 4).isPressed) buttonsBattle.get(i + turn * 4).useRecipe(battleParty[turn]);
+			
+			if(turn < 4) { // While still have party members to go
+				if(battleParty[turn] != null) {
+					for(Button b : recipeButtons[turn]) {
+						b.pressed();
+						b.useRecipe(battleParty[turn]);
+					}
+				}
+				else {
+					turn ++;
+				}
+			}
+			else {
+				isTurn = false;
+				turn = 0;
 			}
 			
 		}
 		else { // Their turn
 			
 			
-			
+			isTurn = true;
 			
 			
 		}
@@ -883,14 +941,15 @@ public class Main extends JPanel implements Runnable{
 		}
 	}
 	public void battleGraphics(Graphics g) {
-		for(int i = 0; i < 4; i++) {
-			if(buttonsBattle.get(i + turn * 4).isPressed)g.setColor(Color.RED); else g.setColor(Color.BLUE);
-			g.fillRect(buttonsBattle.get(i + turn * 4).x, buttonsBattle.get(i + turn * 4).y, buttonsBattle.get(i + turn * 4).w, buttonsBattle.get(i + turn * 4).h);
+		for(Button b : buttonsBattle) {
+			if(b.isPressed)g.setColor(Color.RED); else g.setColor(Color.GREEN);
+			g.fillRect(b.x, b.y, b.w, b.h);
 			g.setColor(Color.BLACK);
-			g.drawString(buttonsBattle.get(i + turn * 4).name, buttonsBattle.get(i + turn * 4).x, buttonsBattle.get(i + turn * 4).y + buttonsBattle.get(i + turn * 4).h/2);
+			g.drawString(b.name, b.x, b.y + b.h/2);
+			if(b.isDisplayFruit) {
+				g.drawImage(b.displayFruit.sprite, b.x, b.y, b.w, b.h, this);
+			}
 		}
-		
-		
 		for(Button b : buttonsAll) {
 			if(b.isPressed)g.setColor(Color.RED); else g.setColor(Color.ORANGE);
 			g.fillRect(b.x, b.y, b.w, b.h);
@@ -898,7 +957,14 @@ public class Main extends JPanel implements Runnable{
 			g.drawString(b.name, b.x, b.y + b.h/2);
 		}
 		
-		
+		if(turn < 4 && isTurn) {
+			for(Button b : recipeButtons[turn]) {
+				if(b.isPressed)g.setColor(Color.RED); else g.setColor(Color.BLUE);
+				g.fillRect(b.x, b.y, b.w, b.h);
+				g.setColor(Color.BLACK);
+				g.drawString(b.name, b.x, b.y + b.h/2);
+			}
+		}
 	}
 	public void menuGraphics(Graphics g) {
 		for(Button b : buttonsMenu) {
@@ -1029,7 +1095,9 @@ public class Main extends JPanel implements Runnable{
 		public String name; // Name of button
 		public boolean isPressed; // Whether or not activated
 		public Fruit[] fruitCollected; // Storage of the fruit used
+		public Fruit displayFruit;
 		
+		private boolean isDisplayFruit = false;
 		private int numOfFruitCollected, countDown, countDownInitial; // Number of fruit inputed into the button
 		private Lambda recipe; // Recipe for combat
 		private Lambda2 usage;
@@ -1047,6 +1115,11 @@ public class Main extends JPanel implements Runnable{
 			this.name = name;
 			
 		}		
+		public Button(String name, int x, int y, int w, int h, Fruit f) { // Fruit selection button
+			this(name, x, y, w, h);
+			displayFruit = f;
+			isDisplayFruit = true;
+		}
 		public Button(String name, int x, int y, int w, int h, int numOfFruit, int countDown) { // For combat selection
 			this(name, x,y,w,h);
 			fruitCollected = new Fruit[numOfFruit];
@@ -1091,7 +1164,7 @@ public class Main extends JPanel implements Runnable{
 		}
 		public void setRecipe(Lambda l, int countDown) { // Changes the recipe
 			recipe = l;
-			name = MainCharacter.cookBookName.get(recipe);
+			name = (MainCharacter.cookBookName.containsKey(recipe))?MainCharacter.cookBookName.get(recipe):"";
 			if(countDown>=0) {
 				countDownInitial = countDown;
 				this.countDown = countDown;

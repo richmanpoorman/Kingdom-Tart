@@ -15,10 +15,13 @@ import java.util.HashMap;
 
 public class MainCharacter extends Character{
 	
-	public static HashMap<String, Integer> inventory = new HashMap<String, Integer>();
+	public static HashMap<Fruit, Integer> inventory = new HashMap<Fruit, Integer>();
 	public static HashMap<String, Lambda> cookBook = new HashMap<String, Lambda>();
+	public static HashMap<String, Integer> cookBookCountdowns = new HashMap<>();
 	public static HashMap<Lambda, String> cookBookName = new HashMap<Lambda, String>();
+
 	public Lambda[] recipes = new Lambda[4];
+	public int[] recipesCountDown = new int[4];
 	public int speed = 5;
 	
 	public MainCharacter(String name, int x, int y, int hp, int dmg, int width, int height, String colorSpecialty) {
@@ -27,30 +30,58 @@ public class MainCharacter extends Character{
 	}
 	
 	public void add(Fruit fruit) {
-		if(inventory.containsKey(fruit.name))
-			inventory.put(fruit.name,inventory.get(fruit.name)+1);
+		if(inventory.containsKey(fruit))
+			inventory.put(fruit,inventory.get(fruit.name)+1);
 		else
-			inventory.put(fruit.name,1);
+			inventory.put(fruit,1);
 	}
 	
-	public boolean use(String fruit) {
-		if (inventory.get(fruit) !=0) {
+	public static boolean use(Fruit fruit) {
+		if (inventory.containsKey(fruit)&&inventory.get(fruit) !=0) {
 			inventory.put(fruit,inventory.get(fruit)-1);
 			return true;
 		}
 		return false;
 	}
 	
-	public void addRecipe(String name, Lambda l) {
+	public static Fruit getRandomFruit() {
+		Set<Fruit> fruitsInInventory = inventory.keySet();
+		Fruit returnFruit = null;
+		while(returnFruit == null) {
+			int a = (int)(Math.random()*inventory.size());
+			int i = 0;
+			for(Fruit fruit : fruitsInInventory) {
+				if(!inventory.get(fruit).equals(0) && i == a) {
+					returnFruit = fruit;
+				}
+				i++;
+			}
+		}
+		return returnFruit;
+	}
+	
+	public void addRecipe(String name, Lambda l, int c) {
 		cookBook.put(name,l);
+		cookBookCountdowns.put(name,c);
 		cookBookName.put(l, name);
 	}
 	
-	public void setRecipes(String a, String b, String c, String d) {
-		recipes[0] = (cookBook.containsKey(a))?cookBook.get(a):(e)->{};
-		recipes[1] = (cookBook.containsKey(b))?cookBook.get(b):(e)->{};
-		recipes[2] = (cookBook.containsKey(c))?cookBook.get(c):(e)->{};
-		recipes[3] = (cookBook.containsKey(d))?cookBook.get(d):(e)->{};
+	public void setRecipes(String a, String b,   String c,  String d) {
+		recipes[0] = (cookBook.containsKey(a))?cookBook.get(a):(z)->{};
+		recipesCountDown[0] = (cookBookCountdowns.containsKey(a))?cookBookCountdowns.get(a):0;
+		
+		recipes[1] = (cookBook.containsKey(b))?cookBook.get(b):(z)->{};
+		recipesCountDown[1] = (cookBookCountdowns.containsKey(b))?cookBookCountdowns.get(b):0;
+		
+		recipes[2] = (cookBook.containsKey(c))?cookBook.get(c):(z)->{};
+		recipesCountDown[2] = (cookBookCountdowns.containsKey(c))?cookBookCountdowns.get(c):0;
+		
+		recipes[3] = (cookBook.containsKey(d))?cookBook.get(d):(z)->{};
+		recipesCountDown[3] = (cookBookCountdowns.containsKey(d))?cookBookCountdowns.get(d):0;
 	}
-
+	
+	public String recipeName(int i) {
+		if(i < 4 && i >= 0 && cookBookName.containsKey(recipes[i])) return cookBookName.get(recipes[i]);
+		return "";
+	}
 }
