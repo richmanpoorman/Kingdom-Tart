@@ -1,18 +1,5 @@
-import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
-import java.io.File;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
-
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
 public class Character {
 	//position
@@ -21,10 +8,8 @@ public class Character {
 	//size
 	public int width, height;
 	//stats
-	public int hp;
-	public int dmg;
+	public int hp, maxHp, dmg;
 	public String name;
-	public int maxHp;
 	
 	public String colorSpecialty;
 	

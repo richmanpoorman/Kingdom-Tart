@@ -18,6 +18,8 @@ public class MainCharacter extends Character{
 	public static HashMap<Fruit, Integer> inventory = new HashMap<Fruit, Integer>();
 	public static HashMap<String, Lambda> cookBook = new HashMap<String, Lambda>();
 	public static HashMap<String, Integer> cookBookCountdowns = new HashMap<>();
+	public static HashMap<String, Lambda3> cookBookFilters = new HashMap<>();
+	public static HashMap<String, Integer> cookBookNum = new HashMap<>();
 	public static HashMap<Lambda, String> cookBookName = new HashMap<Lambda, String>();
 
 	public Lambda[] recipes = new Lambda[4];
@@ -36,12 +38,12 @@ public class MainCharacter extends Character{
 			inventory.put(fruit,1);
 	}
 	
-	public static boolean use(Fruit fruit) {
+	public static Fruit use(Fruit fruit) {
 		if (inventory.containsKey(fruit)&&inventory.get(fruit) !=0) {
 			inventory.put(fruit,inventory.get(fruit)-1);
-			return true;
+			return fruit;
 		}
-		return false;
+		return null;
 	}
 	
 	public static Fruit getRandomFruit() {
@@ -60,12 +62,33 @@ public class MainCharacter extends Character{
 		return returnFruit;
 	}
 	
-	public void addRecipe(String name, Lambda l, int c) {
+	public static void addRecipe(String name, Lambda l, int c) {
 		cookBook.put(name,l);
 		cookBookCountdowns.put(name,c);
 		cookBookName.put(l, name);
 	}
 	
+	public static void addRecipe(String name, Lambda l, int c, int num) {
+		cookBook.put(name,l);
+		cookBookCountdowns.put(name,c);
+		cookBookName.put(l, name);
+		cookBookNum.put(name,num);
+	}
+	
+	public static void addRecipe(String name, Lambda l, int c, Lambda3 filter) {
+		cookBook.put(name,l);
+		cookBookCountdowns.put(name,c);
+		cookBookName.put(l, name);
+		cookBookFilters.put(name,filter);
+	}
+	
+	public static void addRecipe(String name, Lambda l, int c, int num ,Lambda3 filter) {
+		cookBook.put(name,l);
+		cookBookCountdowns.put(name,c);
+		cookBookName.put(l, name);
+		cookBookFilters.put(name,filter);
+		cookBookNum.put(name,num);
+	}
 	public void setRecipes(String a, String b,   String c,  String d) {
 		recipes[0] = (cookBook.containsKey(a))?cookBook.get(a):(z)->{};
 		recipesCountDown[0] = (cookBookCountdowns.containsKey(a))?cookBookCountdowns.get(a):0;

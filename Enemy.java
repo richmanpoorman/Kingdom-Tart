@@ -7,9 +7,10 @@ public class Enemy extends Character{
 	public static HashMap<String, Lambda> cookBook = new HashMap<String, Lambda>();
 	public static HashMap<Lambda, String> cookBookName = new HashMap<Lambda, String>();
 	public static HashMap<String, Integer> cookBookCountdowns = new HashMap<>();
+	public static HashMap<String, Lambda> cookBookMainCharacter = new HashMap<String, Lambda>();
 	public Lambda[] recipes = new Lambda[4];
 	public int[] recipesCountDown = new int[4];
-	public static HashMap<String, Lambda> cookBookMainCharacter = new HashMap<String, Lambda>();
+	
 	
 	
 	
