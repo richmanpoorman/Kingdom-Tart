@@ -82,7 +82,7 @@ public class Character {
 	public void interact(Character tag, Lambda l) {
 		if (isContact(tag)) {
 			l.interact(tag);
-		}
+		} 
 	}
 	
 	public void addOwnRecipe(String s) {

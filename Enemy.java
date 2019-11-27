@@ -1,4 +1,4 @@
-import java.awt.image.BufferedImage;
+
 import java.util.HashMap;
 
 public class Enemy extends Character{
@@ -63,8 +63,8 @@ public class Enemy extends Character{
 		this.isTeam = true;
 		for(int i = 0; i < 4; i++) {
 			if(recipes[i] != null) {
-				p.addRecipe(cookBookName.get(recipes[i]), recipes[i], cookBookCountdowns.get(recipes[i]));
-				
+			//	p.addRecipe(cookBookName.get(recipes[i]), recipes[i], cookBookCountdowns.get(recipes[i]));
+				p.addOwnRecipe(cookBookName.get(recipes[i]));
 			}
 		}
 		p.setRecipes((cookBookName.containsKey(recipes[0]))?cookBookName.get(recipes[0]):"", (cookBookName.containsKey(recipes[1]))?cookBookName.get(recipes[1]):"", (cookBookName.containsKey(recipes[2]))?cookBookName.get(recipes[2]):"", (cookBookName.containsKey(recipes[3]))?cookBookName.get(recipes[3]):"");

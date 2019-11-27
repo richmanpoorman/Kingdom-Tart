@@ -1,17 +1,6 @@
-import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
-import java.io.File;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 
-import javax.imageio.ImageIO;
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Set;
-import java.util.HashMap;
+
 
 public class MainCharacter extends Character{
 	
@@ -33,7 +22,7 @@ public class MainCharacter extends Character{
 	
 	public void add(Fruit fruit) {
 		if(inventory.containsKey(fruit))
-			inventory.put(fruit,inventory.get(fruit.name)+1);
+			inventory.put(fruit,inventory.get(fruit)+1);
 		else
 			inventory.put(fruit,1);
 	}
