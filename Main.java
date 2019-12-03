@@ -793,17 +793,17 @@ public class Main extends JPanel implements Runnable{
 		
 		// MOMENTARY : Add Fruit to the player inventory
 		Fruit[] setUp =  {
-			new Fruit("Strawberry","Red","Sweet",convert("Strawberry.png")),
-			new Fruit("Pineapple","Yellow","Sweet",convert("Pinapple.png")),
-			new Fruit("Apple","Green","Sweet",convert("Apple.png")),
-			new Fruit("Banana","Yellow","Savory",convert("Banana.png")),
-			new Fruit("Blueberry","Blue","Sweet",convert("Blueberry.png")),
-			new Fruit("Carrot","Orange","Savory",convert("Carrot.png")),
-			new Fruit("Grapes","Purple","Savory",convert("Grapes.png")),
-			new Fruit("Kiwi","Green","Sweet",convert("Kiwi.png")),
-			new Fruit("Lemon","Yellow","Sour",convert("Lemon.png")),
-			new Fruit("Orange","Orange","Savory",convert("Orange.png")),
-			new Fruit("Pumpkin","Orange","Savory",convert("Pumpkin.png"))
+			new Fruit("Strawberry",Colors.Red,"Sweet",convert("Strawberry.png")),
+			new Fruit("Pineapple",Colors.Yellow,"Sweet",convert("Pinapple.png")),
+			new Fruit("Apple",Colors.Green,"Sweet",convert("Apple.png")),
+			new Fruit("Banana",Colors.orange,"Savory",convert("Banana.png")),
+			new Fruit("Blueberry",Colors.Blue,"Sweet",convert("Blueberry.png")),
+			new Fruit("Carrot",Colors.orange,"Savory",convert("Carrot.png")),
+			new Fruit("Grapes",Colors.Purple,"Savory",convert("Grapes.png")),
+			new Fruit("Kiwi",Colors.Green,"Sweet",convert("Kiwi.png")),
+			new Fruit("Lemon",Colors.Yellow,"Sour",convert("Lemon.png")),
+			new Fruit("Orange",Colors.orange,"Savory",convert("Orange.png")),
+			new Fruit("Pumpkin",Colors.orange,"Savory",convert("Pumpkin.png"))
 		};
 		for(Fruit f : setUp) {
 			MainCharacter.inventory.put(f, 100);
@@ -821,12 +821,12 @@ public class Main extends JPanel implements Runnable{
 		for(int i = 0; i < 4; i++) recipeButtons[0][i].setRecipe("");
 		// MOMENTARY: Adding Button Functionality
 				recipeButtons[0][0].name = "Test";
-				MainCharacter.addRecipe("Test",(MainCharacter)->System.out.println("YES"),12,3,(f)->(f.color.equals("Blue")||f.color.equals("Red")));
+				MainCharacter.addRecipe("Test",(MainCharacter)->System.out.println("YES"),12,3,(f)->(f.color.equals(Colors.Blue)||f.color.equals(Colors.Red)));
 				battleParty[0].addOwnRecipe("Test");
 				recipeButtons[0][0].setRecipe("Test");
 				
 				recipeButtons[0][1].name = "Bake";
-				MainCharacter.addRecipe("Bake",(m)->setEnemy(m.isTeam).hp -= 12,4,3,(f)->(f.color.equals("Orange")||f.color.equals("Yellow")));
+				MainCharacter.addRecipe("Bake",(m)->setEnemy(m.isTeam).hp -= 12,4,3,(f)->(f.color.equals(Colors.orange)||f.color.equals(Colors.Yellow)));
 				battleParty[0].addOwnRecipe("Bake");
 				recipeButtons[0][1].setRecipe("Bake");
 		
@@ -1022,6 +1022,30 @@ public class Main extends JPanel implements Runnable{
 						if(b.fruitCollected[i] != null) {
 							g.drawImage(b.fruitCollected[i].sprite,b.x + 21*i, b.y + b.h/2, 20,20,this);
 						}
+						else {
+							if(b.filter != null){
+								Fruit f = new Fruit ("", null, "", null);
+								for(Colors c : Colors.values()) {
+									f.color = c;
+									if(b.filter(f)) {
+										
+										g.drawImage(convert(c==Colors.orange?("OG.png"):(c.name() + ".png")) ,b.x + 21*i, b.y + b.h/2, 20,20,this);
+										
+										for(Colors o : Colors.values()) {
+											f.color = o;
+											
+											if(b.filter(f) && !o.equals(c)) {
+												g.drawImage(convert(o==Colors.orange?("Half_OG.png"):("Half_"+ o.name() + ".png")) ,b.x + 21*i, b.y + b.h/2, 20,20,this);
+												break;
+											}
+										}
+										break;
+									}
+								}
+							}
+							else g.drawImage(convert("Empty.png") ,b.x + 21*i, b.y + b.h/2, 20,20,this);
+								
+						}
 					}
 				}
 			}
@@ -1087,6 +1111,7 @@ public class Main extends JPanel implements Runnable{
 		catch(IOException e)
 		{
 			e.printStackTrace();
+			
 			throw new IllegalArgumentException();
 		}
 		return img;
